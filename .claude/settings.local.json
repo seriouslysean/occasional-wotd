@@ -14,7 +14,8 @@
       "WebFetch(domain:docs.astro.build)",
       "Bash(git -C /Users/kennedys1/Projects/wordbug status)",
       "Bash(git -C /Users/kennedys1/Projects/wordbug log --oneline -5)",
-      "Bash(diff:*)"
+      "Bash(diff:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }
