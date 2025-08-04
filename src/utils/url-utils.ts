@@ -38,14 +38,23 @@ export const getUrl = (path = '/'): string => {
  */
 export const getFullUrl = (path = '/'): string => {
   const siteUrl = import.meta.env.SITE_URL || DEFAULT_SITE_URL;
-  const url = new URL(getUrl(path), siteUrl);
 
-  if (!path || path === '/') {
-    const full = url.toString();
-    return full.endsWith('/') ? full : `${full}/`;
+  try {
+    const url = new URL(getUrl(path), siteUrl);
+
+    if (!path || path === '/') {
+      const full = url.toString();
+      return full.endsWith('/') ? full : `${full}/`;
+    }
+
+    return url.toString().replace(/\/$/, '');
+  } catch (error) {
+    logger.error('Failed to construct URL with SITE_URL', {
+      siteUrl,
+      error: (error as Error).message,
+    });
+    throw new Error('SITE_URL environment variable is not a valid URL');
   }
-
-  return url.toString().replace(/\/$/, '');
 };
 
 /**

@@ -64,5 +64,10 @@ describe('utils', () => {
       vi.stubEnv('SITE_URL', '');
       expect(getFullUrl('/')).toBe('http://localhost:4321/');
     });
+
+    it('throws when SITE_URL is invalid', () => {
+      vi.stubEnv('SITE_URL', 'not-a-url');
+      expect(() => getFullUrl('/')).toThrow('SITE_URL environment variable is not a valid URL');
+    });
   });
 });
