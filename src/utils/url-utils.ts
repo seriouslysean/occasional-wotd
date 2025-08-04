@@ -13,7 +13,7 @@ export const getUrl = (path = '/'): string => {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   }
 
-  if (/\/\/+/.test(path)) {
+  if (path.includes('//')) {
     logger.error('Invalid path contains multiple consecutive slashes', { path });
     throw new Error('Invalid path: contains multiple consecutive slashes');
   }

@@ -48,6 +48,7 @@ describe('utils', () => {
     it('rejects paths with multiple consecutive slashes', () => {
       expect(() => getUrl('//20240319')).toThrow('Invalid path: contains multiple consecutive slashes');
       expect(() => getUrl('///20240319')).toThrow('Invalid path: contains multiple consecutive slashes');
+      expect(() => getUrl('/2024//0319')).toThrow('Invalid path: contains multiple consecutive slashes');
     });
 
     it('preserves trailing slashes for root path only', () => {
