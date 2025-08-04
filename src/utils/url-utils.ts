@@ -1,11 +1,14 @@
 import { logger } from '~utils/logger';
 
+const PLACEHOLDER_ORIGIN = 'http://placeholder';
+
 /**
  * Constructs a URL with the base URL if configured.
  * Normalizes trailing slashes except for the root path.
  */
 export const getUrl = (path = '/'): string => {
   const baseUrl = import.meta.env.BASE_URL || '/';
+  const siteUrl = import.meta.env.SITE_URL || PLACEHOLDER_ORIGIN;
 
   if (!path || path === '') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -21,7 +24,10 @@ export const getUrl = (path = '/'): string => {
   }
 
   const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-  const joined = new URL(path.replace(/^\//, ''), `http://x${base}`).pathname;
+  const joined = new URL(
+    path.replace(/^\//, ''),
+    new URL(base, siteUrl),
+  ).pathname;
 
   return joined.includes('.') ? joined : joined.replace(/\/$/, '');
 };

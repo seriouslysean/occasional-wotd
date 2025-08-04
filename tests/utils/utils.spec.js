@@ -24,6 +24,12 @@ describe('utils', () => {
       expect(getUrl('/20240319')).toBe('/blog/20240319');
     });
 
+    it('combines site origin with base URL', () => {
+      vi.stubEnv('BASE_URL', '/blog');
+      vi.stubEnv('SITE_URL', 'https://example.com');
+      expect(getUrl('/20240319')).toBe('/blog/20240319');
+    });
+
     it('handles empty or undefined base URL', () => {
       vi.stubEnv('BASE_URL', '');
       expect(getUrl('/20240319')).toBe('/20240319');
