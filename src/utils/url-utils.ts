@@ -9,11 +9,7 @@ const DEFAULT_SITE_URL = 'http://localhost:4321';
 export const getUrl = (path = '/'): string => {
   const baseUrl = import.meta.env.BASE_URL || '/';
 
-  if (!path || path === '') {
-    return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-  }
-
-  if (path === '/') {
+  if (!path || path === '/') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   }
 
@@ -34,15 +30,15 @@ export const getUrl = (path = '/'): string => {
 export const getFullUrl = (path = '/'): string => {
   const siteUrl = import.meta.env.SITE_URL || DEFAULT_SITE_URL;
 
+  if (!path) {
+    const base = new URL(siteUrl);
+    const fullBase = base.toString();
+    return fullBase.endsWith('/') ? fullBase : `${fullBase}/`;
+  }
+
   try {
     const url = new URL(getUrl(path), siteUrl);
-
-    if (!path || path === '/') {
-      const full = url.toString();
-      return full.endsWith('/') ? full : `${full}/`;
-    }
-
-    return url.toString().replace(/\/$/, '');
+    return path === '/' ? url.toString() : url.toString().replace(/\/$/, '');
   } catch (error) {
     logger.error('Failed to construct URL with SITE_URL', {
       siteUrl,

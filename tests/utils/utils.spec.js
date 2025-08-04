@@ -60,6 +60,11 @@ describe('utils', () => {
       expect(getUrl('/ABC')).toBe('/Blog/ABC');
     });
 
+    it('handles empty paths when building full URLs', () => {
+      vi.stubEnv('SITE_URL', 'https://example.com');
+      expect(getFullUrl('')).toBe('https://example.com/');
+    });
+
     it('uses default site URL when none provided', () => {
       vi.stubEnv('SITE_URL', '');
       expect(getFullUrl('/')).toBe('http://localhost:4321/');
