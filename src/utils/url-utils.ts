@@ -8,7 +8,6 @@ const DEFAULT_SITE_URL = 'http://localhost:4321';
  */
 export const getUrl = (path = '/'): string => {
   const baseUrl = import.meta.env.BASE_URL || '/';
-  const siteUrl = import.meta.env.SITE_URL || DEFAULT_SITE_URL;
 
   if (!path || path === '') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -23,13 +22,9 @@ export const getUrl = (path = '/'): string => {
     throw new Error('Invalid path: contains multiple consecutive slashes');
   }
 
-  const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-  const joined = new URL(
-    path.replace(/^\//, ''),
-    new URL(base, siteUrl),
-  ).pathname;
-
-  return joined.includes('.') ? joined : joined.replace(/\/$/, '');
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${normalizedBase}${normalizedPath.replace(/\/$/, '')}`;
 };
 
 /**
