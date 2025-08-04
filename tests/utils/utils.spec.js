@@ -48,5 +48,10 @@ describe('utils', () => {
       expect(getUrl('/')).toBe('/');
       expect(getUrl('/20240319/')).toBe('/20240319');
     });
+
+    it('preserves case for base URL and path', () => {
+      vi.stubEnv('BASE_URL', '/Blog');
+      expect(getUrl('/ABC')).toBe('/Blog/ABC');
+    });
   });
 });
