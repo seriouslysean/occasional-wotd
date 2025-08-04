@@ -1,6 +1,6 @@
 import { logger } from '~utils/logger';
 
-const PLACEHOLDER_ORIGIN = 'http://placeholder';
+const DEFAULT_SITE_URL = 'http://localhost:4321';
 
 /**
  * Constructs a URL with the base URL if configured.
@@ -8,7 +8,7 @@ const PLACEHOLDER_ORIGIN = 'http://placeholder';
  */
 export const getUrl = (path = '/'): string => {
   const baseUrl = import.meta.env.BASE_URL || '/';
-  const siteUrl = import.meta.env.SITE_URL || PLACEHOLDER_ORIGIN;
+  const siteUrl = import.meta.env.SITE_URL || DEFAULT_SITE_URL;
 
   if (!path || path === '') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -37,7 +37,7 @@ export const getUrl = (path = '/'): string => {
  * Uses {@link getUrl} for path resolution.
  */
 export const getFullUrl = (path = '/'): string => {
-  const siteUrl = import.meta.env.SITE_URL;
+  const siteUrl = import.meta.env.SITE_URL || DEFAULT_SITE_URL;
   const url = new URL(getUrl(path), siteUrl);
 
   if (!path || path === '/') {

@@ -2,7 +2,7 @@ import {
  beforeEach, describe, expect, it, vi,
 } from 'vitest';
 
-import { getUrl } from '~utils/url-utils';
+import { getFullUrl, getUrl } from '~utils/url-utils';
 
 describe('utils', () => {
   describe('getUrl', () => {
@@ -58,6 +58,11 @@ describe('utils', () => {
     it('preserves case for base URL and path', () => {
       vi.stubEnv('BASE_URL', '/Blog');
       expect(getUrl('/ABC')).toBe('/Blog/ABC');
+    });
+
+    it('uses default site URL when none provided', () => {
+      vi.stubEnv('SITE_URL', '');
+      expect(getFullUrl('/')).toBe('http://localhost:4321/');
     });
   });
 });
