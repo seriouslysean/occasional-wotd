@@ -160,7 +160,7 @@ async function regenerateAllWords(options: RegenerateOptions): Promise<void> {
           await new Promise(resolve => setTimeout(resolve, options.timeout));
         }
       } catch (error) {
-        console.error(`Error processing ${item.word}:`, (error as Error).message);
+        console.error(`Failed to process ${item.word}`, { error: (error as Error).message });
         failureCount++;
       }
     }
@@ -171,7 +171,7 @@ async function regenerateAllWords(options: RegenerateOptions): Promise<void> {
     console.log(`Total processed: ${successCount + failureCount} words`);
 
   } catch (error) {
-    console.error('Error regenerating words:', (error as Error).message);
+    console.error('Failed to regenerate words', { error: (error as Error).message });
     process.exit(1);
   }
 }
