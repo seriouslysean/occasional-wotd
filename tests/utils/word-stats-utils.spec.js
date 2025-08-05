@@ -11,7 +11,7 @@ import {
   getSyllableStats,
   getWordEndingStats,
   getWordStats,
-} from '../../src/utils/word-stats-utils';
+} from '~utils-client/word-stats-utils';
 
 const sampleWords = [
   { word: 'hello', date: '20240101' },
