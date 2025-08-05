@@ -6,7 +6,6 @@ import {
   getLetterPatternStats,
   getLetterStats,
   getLetterTypeStats,
-  // getMilestoneWords,
   getPatternStats,
   getSyllableStats,
   getWordEndingStats,
