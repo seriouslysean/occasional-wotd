@@ -1,32 +1,19 @@
 /**
- * Base stats definition structure
+ * Base stats definition supporting both static and dynamic descriptions
  */
 export interface StatsDefinition {
   title: string;
-  pageDescription: string;
-  metaDescription: (count: number) => string;
-  category: 'stats';
-}
-
-/**
- * Static stats definition with string-only meta description
- */
-export interface StaticStatsDefinition {
-  title: string;
-  pageDescription: string;
-  metaDescription: string;
-  category: 'stats';
-}
-
-/**
- * Dynamic stats definition with function-based descriptions
- */
-export interface DynamicStatsDefinition {
-  title: string;
-  pageDescription: (arg?: string | number) => string;
+  pageDescription: string | ((arg?: string | number) => string);
   metaDescription: (count: number, arg?: string) => string;
   category: 'stats';
 }
+
+/**
+ * Stats definition variant requiring dynamic descriptions
+ */
+export type DynamicStatsDefinition = StatsDefinition & {
+  pageDescription: (arg?: string | number) => string;
+};
 
 /**
  * Available word suffix patterns
