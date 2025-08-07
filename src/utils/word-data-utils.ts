@@ -48,22 +48,30 @@ export function extractWordDefinition(wordData: WordData): { definition: string;
 
 /**
  * All words loaded with consistent sorting across environments
+ * Cache is encapsulated for explicit state management
  */
-let _cachedWords: WordData[] | null = null;
+function createWordsLoader() {
+  let cached: WordData[] | null = null;
 
-async function getAllWords(): Promise<WordData[]> {
-  if (_cachedWords === null) {
-    try {
-      _cachedWords = await getWordsFromCollection();
-      logger.info('Loaded words successfully', { count: _cachedWords.length });
-    } catch (error) {
-      logger.error('Failed to load words', { error: (error as Error).message });
-      _cachedWords = [];
+  return async (refresh = false): Promise<WordData[]> => {
+    if (refresh) {
+      cached = null;
     }
-  }
-  return _cachedWords;
+    if (cached === null) {
+      try {
+        cached = await getWordsFromCollection();
+        logger.info('Loaded words successfully', { count: cached.length });
+      } catch (error) {
+        logger.error('Failed to load words', { error: (error as Error).message });
+        cached = [];
+      }
+    }
+    return cached;
+  };
 }
 
+export const getAllWords = createWordsLoader();
+export const resetWordsCache = () => getAllWords(true);
 export const allWords = await getAllWords();
 
 
