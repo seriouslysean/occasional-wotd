@@ -19,7 +19,8 @@
       "Bash(npm run build:*)",
       "Bash(cat:*)",
       "Bash(git checkout:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(jq:*)"
     ],
     "deny": []
   }
