@@ -70,6 +70,8 @@ adapters/                    # Dictionary API adapters
 ```
 
 ## Environment Configuration
+Environment variables are centralized in `config/environment.ts`. This module loads variables at startup,
+applies development defaults, validates required values, and exposes typed getters for use throughout the codebase.
 
 ### Required Variables
 ```bash

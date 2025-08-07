@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 
+import { env } from '~config/environment';
 import { generateRobotsTxt } from '~utils-client/static-file-utils';
 
 /**
@@ -7,11 +8,7 @@ import { generateRobotsTxt } from '~utils-client/static-file-utils';
  * @returns Plain text robots.txt content
  */
 export const GET: APIRoute = () => {
-  const siteUrl = import.meta.env.SITE_URL;
-  if (!siteUrl) {
-    throw new Error('SITE_URL environment variable is required for robots.txt generation');
-  }
-  const robotsTxt = generateRobotsTxt(siteUrl);
+  const robotsTxt = generateRobotsTxt(env.SITE_URL);
 
   return new Response(robotsTxt, {
     headers: {

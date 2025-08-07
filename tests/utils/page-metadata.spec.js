@@ -29,9 +29,11 @@ describe('page-metadata', () => {
       });
     });
 
-    it('handles BASE_PATH in pathname', () => {
+    it('handles BASE_PATH in pathname', async () => {
       vi.stubEnv('BASE_PATH', '/vocab');
-      const metadata = getPageMetadata('/vocab/words');
+      vi.resetModules();
+      const { getPageMetadata: fresh } = await import('~utils-client/page-metadata');
+      const metadata = fresh('/vocab/words');
       expect(metadata.title).toBe('All Words');
       vi.unstubAllEnvs();
     });
