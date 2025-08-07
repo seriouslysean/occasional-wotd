@@ -32,3 +32,13 @@ export async function getStaticPages() {
   const { getAllPageMetadata } = await import('~utils-client/page-metadata');
   return getAllPageMetadata();
 }
+
+/**
+ * Get cat image URL for a word
+ * @param word - Word of the day
+ * @returns URL to the cat image
+ */
+export function getCatImageUrl(word: string): string {
+  const baseUrl = (import.meta.env.CAT_IMAGE_BASE_URL || 'https://cataas.com/cat/says').replace(/\/$/, '');
+  return `${baseUrl}/${encodeURIComponent(word)}`;
+}

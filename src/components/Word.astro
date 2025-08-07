@@ -3,6 +3,7 @@ import Heading from '~components/Heading.astro';
 import WordDescription from '~components/WordDescription.astro';
 import type { WordData } from '~types/word';
 import { formatDate } from '~utils/date-utils';
+import { getCatImageUrl } from '~utils-client/image-utils';
 import { getWordDetails } from '~utils-client/word-data-utils';
 
 interface Props {
@@ -17,6 +18,7 @@ if (!word) {
 }
 
 const { partOfSpeech, definition, meta } = getWordDetails(word);
+const catImageUrl = getCatImageUrl(word.word);
 ---
 
 <article class="word">
@@ -26,6 +28,11 @@ const { partOfSpeech, definition, meta } = getWordDetails(word);
     partOfSpeech={partOfSpeech}
     definition={definition}
     meta={meta}
+  />
+  <img
+    src={catImageUrl}
+    alt={`A cat related to the word ${word.word}`}
+    class="word__cat-image"
   />
 </article>
 
@@ -42,7 +49,14 @@ const { partOfSpeech, definition, meta } = getWordDetails(word);
         display: block;
         font-size: var(--font-size-xs, 0.75rem);
         color: var(--color-text-light);
-        margin-bottom: var(--spacing-small);
-    }
+      margin-bottom: var(--spacing-small);
+      }
+
+      .word__cat-image {
+          width: 100%;
+          max-width: 400px;
+          height: auto;
+          margin-top: var(--spacing-large);
+      }
 
 </style>
