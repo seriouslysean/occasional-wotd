@@ -26,6 +26,7 @@ A template for creating family word-of-the-day sites that provides a foundation 
 - **Rich Word Data**: Powered by Wordnik API with comprehensive definitions
 - **Smart Statistics**: Letter patterns, word endings, reading streaks, and linguistic analysis
 - **Social Images**: Automated generation of beautiful, shareable word graphics
+- **Cat Companions**: Each word is paired with a delightful cat photo
 - **Lightning Fast**: Static site generation with Astro for optimal performance
 - **Customizable**: Environment-based theming and multi-source data support
 - **Accessible**: WCAG compliant with keyboard navigation and screen reader support
@@ -76,6 +77,9 @@ SOURCE_DIR="words"                      # Data source (demo, words, etc.)
 # Dictionary Service
 DICTIONARY_ADAPTER="wordnik"
 WORDNIK_API_KEY="your-api-key-here"
+
+# Cat Images
+CAT_IMAGE_BASE_URL="https://cataas.com/cat/says"
 
 # Colors (optional)
 COLOR_PRIMARY="#b45309"

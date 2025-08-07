@@ -84,6 +84,11 @@ SOURCE_DIR                  # Data source directory (default: "demo")
 DICTIONARY_ADAPTER          # Dictionary service (default: "wordnik")
 ```
 
+### Cat Image Service
+```bash
+CAT_IMAGE_BASE_URL         # Base URL for cat images (default: https://cataas.com/cat/says)
+```
+
 ### Color Customization
 ```bash
 COLOR_PRIMARY               # Primary brand color
