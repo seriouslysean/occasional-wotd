@@ -68,28 +68,33 @@ async function generateAllImages(): Promise<void> {
   const allWords = getAllWords();
   console.log('Starting bulk image generation', { wordCount: allWords.length });
 
-  let successCount = 0;
-  let errorCount = 0;
+  const concurrency = 5;
+  const results: boolean[] = [];
 
-  for (const wordData of allWords) {
-    try {
-      await generateShareImage(wordData.word, wordData.date);
-      console.log('Generated image', { word: wordData.word, date: wordData.date });
-      successCount++;
-    } catch (error) {
-      console.error('Failed to generate image', {
-        word: wordData.word,
-        date: wordData.date,
-        error: (error as Error).message,
-      });
-      errorCount++;
-    }
+  for (let i = 0; i < allWords.length; i += concurrency) {
+    const batch = allWords.slice(i, i + concurrency).map(async wordData => {
+      try {
+        await generateShareImage(wordData.word, wordData.date);
+        console.log('Generated image', { word: wordData.word, date: wordData.date });
+        return true;
+      } catch (error) {
+        console.error('Failed to generate image', {
+          word: wordData.word,
+          date: wordData.date,
+          error: (error as Error).message,
+        });
+        return false;
+      }
+    });
+    const batchResults = await Promise.all(batch);
+    results.push(...batchResults);
   }
 
+  const success = results.filter(Boolean).length;
   console.log('Bulk image generation complete', {
     total: allWords.length,
-    success: successCount,
-    errors: errorCount,
+    success,
+    errors: results.length - success,
   });
 }
 
