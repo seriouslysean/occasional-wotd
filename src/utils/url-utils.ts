@@ -1,3 +1,4 @@
+import { env } from '~config/environment';
 import { logger } from '~utils-client/logger';
 
 /**
@@ -7,7 +8,7 @@ import { logger } from '~utils-client/logger';
  * @returns Normalized URL path
  */
 export const getUrl = (path = '/'): string => {
-  const baseUrl = import.meta.env.BASE_PATH || '/';
+  const baseUrl = env.BASE_PATH || '/';
 
   if (!path || path === '') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -39,14 +40,8 @@ export const getUrl = (path = '/'): string => {
  * @returns Absolute URL
  */
 export const getFullUrl = (path = '/'): string => {
-  const siteUrl = import.meta.env.SITE_URL?.replace(/\/$/, '') || '';
+  const siteUrl = env.SITE_URL.replace(/\/$/, '');
   const relativePath = getUrl(path);
-
-  if (!siteUrl) {
-    logger.error('SITE_URL environment variable is required for getFullUrl');
-    throw new Error('SITE_URL environment variable is required');
-  }
-
   return `${siteUrl}${relativePath}`;
 };
 

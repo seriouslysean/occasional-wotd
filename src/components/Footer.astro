@@ -1,11 +1,12 @@
 ---
 import wordnikLogo from '~assets/wordnik-gearheart.png';
 import SiteLink from '~components/SiteLink.astro';
+import { env } from '~config/environment';
 
 const currentYear = new Date().getFullYear();
-const attributionUrl = import.meta.env.SITE_AUTHOR_URL;
-const authorName = import.meta.env.SITE_AUTHOR;
-const attributionMessage = import.meta.env.SITE_ATTRIBUTION_MESSAGE;
+const attributionUrl = env.SITE_AUTHOR_URL;
+const authorName = env.SITE_AUTHOR;
+const attributionMessage = env.SITE_ATTRIBUTION_MESSAGE;
 const showAttribution = attributionUrl && authorName && attributionMessage;
 ---
 

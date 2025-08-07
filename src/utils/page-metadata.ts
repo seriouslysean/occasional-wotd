@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 
+import { env } from '~config/environment';
 import type { WordData } from '~types/word';
 import { MONTH_NAMES, monthSlugToNumber } from '~utils/date-utils';
 import { logger } from '~utils-client/logger';
@@ -309,7 +310,7 @@ export function getPageMetadata(pathname?: string, words: WordData[] = allWords)
 throw new Error('getPageMetadata: pathname is required. Pass Astro.url.pathname from your page.');
 }
     let path = pathname.replace(/^\//, '').replace(/\/$/, '');
-    const basePath = import.meta.env.BASE_PATH?.replace(/^\/|\/$/g, '') || '';
+    const basePath = env.BASE_PATH.replace(/^\/|\/$/g, '') || '';
     if (basePath && (path === basePath || path.startsWith(`${basePath}/`))) {
       path = path.slice(basePath.length).replace(/^\//, '');
     }

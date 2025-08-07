@@ -1,10 +1,11 @@
 ---
 import SiteLink from '~components/SiteLink.astro';
+import { env } from '~config/environment';
 ---
 
 <header class="header">
   <SiteLink href="/" class="header__link" ariaLabel="Return to home page">
-    <h2 class="header__title">{import.meta.env.SITE_TITLE}</h2>
+    <h2 class="header__title">{env.SITE_TITLE}</h2>
   </SiteLink>
 </header>
 

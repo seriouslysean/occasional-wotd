@@ -1,5 +1,6 @@
 import { captureException, captureMessage, withScope } from '@sentry/astro';
 
+import { env } from '~config/environment';
 import type { LogContext } from '~types/common';
 
 /**
@@ -10,7 +11,7 @@ import type { LogContext } from '~types/common';
  * @returns {void} Nothing
  */
 export function logError(error: Error | string, context: LogContext = {}, level: 'error' | 'warning' | 'info' = 'error'): void {
-  if (import.meta.env.SENTRY_ENABLED !== 'true') {
+  if (!env.SENTRY_ENABLED) {
     return;
   }
   if (Object.keys(context).length > 0) {

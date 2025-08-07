@@ -6,82 +6,81 @@ import {
   vi,
 } from 'vitest';
 
-import { getUrl, getWordUrl } from '~utils-client/url-utils';
-
 describe('WordLink Component Integration', () => {
   beforeEach(() => {
-    vi.stubEnv('BASE_PATH', '/');
+    vi.resetModules();
   });
 
   describe('getWordUrl', () => {
-    it('should return relative path without BASE_PATH processing', () => {
+    it('should return relative path without BASE_PATH processing', async () => {
+      vi.stubEnv('BASE_PATH', '/');
+      const { getWordUrl } = await import('~utils-client/url-utils');
       expect(getWordUrl('serendipity')).toBe('/words/serendipity');
       expect(getWordUrl('ice cream')).toBe('/words/ice cream');
     });
 
-    it('should return empty string for empty word', () => {
+    it('should return empty string for empty word', async () => {
+      vi.stubEnv('BASE_PATH', '/');
+      const { getWordUrl } = await import('~utils-client/url-utils');
       expect(getWordUrl('')).toBe('');
     });
 
-    it('should work regardless of BASE_PATH', () => {
+    it('should work regardless of BASE_PATH', async () => {
       vi.stubEnv('BASE_PATH', '/occasional-wotd');
+      const { getWordUrl } = await import('~utils-client/url-utils');
       expect(getWordUrl('test')).toBe('/words/test');
     });
   });
 
   describe('WordLink + SiteLink integration flow', () => {
-    it('should prevent double BASE_PATH with no subdirectory', () => {
+    it('should prevent double BASE_PATH with no subdirectory', async () => {
       vi.stubEnv('BASE_PATH', '/');
-
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
       const rawPath = getWordUrl('serendipity');
       const processedUrl = getUrl(rawPath);
-
       expect(rawPath).toBe('/words/serendipity');
       expect(processedUrl).toBe('/words/serendipity');
     });
 
-    it('should prevent double BASE_PATH with subdirectory', () => {
+    it('should prevent double BASE_PATH with subdirectory', async () => {
       vi.stubEnv('BASE_PATH', '/occasional-wotd');
-
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
       const rawPath = getWordUrl('serendipity');
       const processedUrl = getUrl(rawPath);
-
       expect(rawPath).toBe('/words/serendipity');
       expect(processedUrl).toBe('/occasional-wotd/words/serendipity');
       expect(processedUrl).not.toContain('/occasional-wotd/occasional-wotd/');
     });
 
-    it('should handle multi-word phrases correctly', () => {
+    it('should handle multi-word phrases correctly', async () => {
       vi.stubEnv('BASE_PATH', '/occasional-wotd');
-
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
       const rawPath = getWordUrl('ice cream');
       const processedUrl = getUrl(rawPath);
-
       expect(rawPath).toBe('/words/ice cream');
       expect(processedUrl).toBe('/occasional-wotd/words/ice cream');
     });
 
-    it('should handle special characters in words', () => {
+    it('should handle special characters in words', async () => {
       vi.stubEnv('BASE_PATH', '/occasional-wotd');
-
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
       const rawPath = getWordUrl("don't");
       const processedUrl = getUrl(rawPath);
-
       expect(rawPath).toBe("/words/don't");
       expect(processedUrl).toBe("/occasional-wotd/words/don't");
     });
   });
 
   describe('Real-world GitHub Pages scenarios', () => {
-    it('should match expected GitHub Pages URLs', () => {
+    it('should match expected GitHub Pages URLs', async () => {
       vi.stubEnv('BASE_PATH', '/occasional-wotd');
-
-        const testCases = [
-          { word: 'serendipity', expected: '/occasional-wotd/words/serendipity' },
-          { word: 'ice cream', expected: '/occasional-wotd/words/ice cream' },
-          { word: 'a', expected: '/occasional-wotd/words/a' },
-          { word: 'occasional', expected: '/occasional-wotd/words/occasional' },
-        ];
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
+      const testCases = [
+        { word: 'serendipity', expected: '/occasional-wotd/words/serendipity' },
+        { word: 'ice cream', expected: '/occasional-wotd/words/ice cream' },
+        { word: 'a', expected: '/occasional-wotd/words/a' },
+        { word: 'occasional', expected: '/occasional-wotd/words/occasional' },
+      ];
 
       for (const { word, expected } of testCases) {
         const rawPath = getWordUrl(word);
@@ -90,12 +89,11 @@ describe('WordLink Component Integration', () => {
       }
     });
 
-    it('should work correctly for localhost development', () => {
+    it('should work correctly for localhost development', async () => {
       vi.stubEnv('BASE_PATH', '/');
-
+      const { getUrl, getWordUrl } = await import('~utils-client/url-utils');
       const rawPath = getWordUrl('test');
       const processedUrl = getUrl(rawPath);
-
       expect(rawPath).toBe('/words/test');
       expect(processedUrl).toBe('/words/test');
     });

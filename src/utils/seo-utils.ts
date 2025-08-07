@@ -3,19 +3,20 @@
  * Centralized SEO config following Astro best practices
  */
 
+import { env } from '~config/environment';
 import type { SeoConfig, SeoMetadata, SeoMetadataOptions, SeoMetaDescriptionOptions } from '~types/seo';
 import { getFullUrl } from '~utils-client/url-utils';
 
 // SEO configuration using environment variables - no fallbacks for security
 export const seoConfig: SeoConfig = {
-  defaultTitle: import.meta.env.SITE_TITLE,
-  defaultDescription: import.meta.env.SITE_DESCRIPTION,
-  siteName: import.meta.env.SITE_ID,
-  locale: import.meta.env.SITE_LOCALE || 'en-US',
-  author: import.meta.env.SITE_AUTHOR,
-  authorUrl: import.meta.env.SITE_AUTHOR_URL,
-  attributionMessage: import.meta.env.SITE_ATTRIBUTION_MESSAGE,
-  keywords: (import.meta.env.SITE_KEYWORDS || '').split(',').filter(Boolean),
+  defaultTitle: env.SITE_TITLE,
+  defaultDescription: env.SITE_DESCRIPTION,
+  siteName: env.SITE_ID,
+  locale: env.SITE_LOCALE,
+  author: env.SITE_AUTHOR,
+  authorUrl: env.SITE_AUTHOR_URL,
+  attributionMessage: env.SITE_ATTRIBUTION_MESSAGE,
+  keywords: env.SITE_KEYWORDS,
 };
 
 

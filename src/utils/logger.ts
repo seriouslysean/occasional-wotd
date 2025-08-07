@@ -12,11 +12,12 @@
  * - Optional Sentry integration (decoupled)
  */
 
+import { env } from '~config/environment';
 import { logError } from '~utils-client/sentry-client';
 
 // Fast-fail environment configuration
-const isDev = import.meta.env?.DEV ?? false;
-const sentryEnabled = import.meta.env?.SENTRY_ENABLED === 'true';
+const isDev = env.NODE_ENV !== 'production';
+const sentryEnabled = env.SENTRY_ENABLED;
 
 
 /**
@@ -61,7 +62,7 @@ return;
 export const config = {
   isDev,
   sentryEnabled,
-  version: import.meta.env?.npm_package_version ?? '0.0.0',
+  version: env.PACKAGE_VERSION,
 } as const;
 
 /**

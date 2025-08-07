@@ -6,12 +6,11 @@ import sitemap from '@astrojs/sitemap';
 import sentry from '@sentry/astro';
 import { defineConfig } from 'astro/config';
 
+import { env } from './config/environment';
 import pkg from './package.json' with { type: 'json' };
 
-// Generate code hash for Sentry release version
 function getCodeHash() {
   const hash = createHash('sha256');
-
   const srcFiles = execSync('git ls-files src/', { encoding: 'utf8' })
     .trim()
     .split('\n')
@@ -31,42 +30,8 @@ function getCodeHash() {
   return hash.digest('hex').substring(0, 8);
 }
 
-// Load .env locally, skip in CI (GitHub Actions etc)
-if (!process.env.CI) {
-  import('dotenv/config');
-}
-
-// Environment variable defaults for development and PR builds
-const defaults = {
-  SITE_URL: 'https://localhost:4321',
-  SITE_TITLE: 'Occasional Word of the Day',
-  SITE_DESCRIPTION: 'A word-of-the-day site featuring interesting vocabulary',
-  SITE_ID: 'occasional-wotd',
-  SOURCE_DIR: 'demo',
-};
-
-// Apply defaults for missing environment variables
-Object.entries(defaults).forEach(([key, value]) => {
-  if (!process.env[key]) {
-    process.env[key] = value;
-  }
-});
-
-// Validate that we now have all required variables
-const requiredEnvVars = [
-  'SITE_URL',
-  'SITE_TITLE',
-  'SITE_DESCRIPTION',
-  'SITE_ID',
-];
-
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
-if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
-}
-
-const site = process.env.SITE_URL;
-const base = process.env.BASE_PATH;
+const site = env.SITE_URL;
+const base = env.BASE_PATH;
 const sentryEnvironment = process.env.SENTRY_ENVIRONMENT || 'development';
 const codeHash = getCodeHash();
 const version = pkg.version;
@@ -108,10 +73,10 @@ export default defineConfig({
       __RELEASE__: JSON.stringify(release),
       __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN),
       __SENTRY_ENVIRONMENT__: JSON.stringify(sentryEnvironment),
-      __SITE_ID__: JSON.stringify(process.env.SITE_ID),
-      __SITE_TITLE__: JSON.stringify(process.env.SITE_TITLE),
-      __SITE_DESCRIPTION__: JSON.stringify(process.env.SITE_DESCRIPTION),
-      __SITE_URL__: JSON.stringify(process.env.SITE_URL || ''),
+      __SITE_ID__: JSON.stringify(env.SITE_ID),
+      __SITE_TITLE__: JSON.stringify(env.SITE_TITLE),
+      __SITE_DESCRIPTION__: JSON.stringify(env.SITE_DESCRIPTION),
+      __SITE_URL__: JSON.stringify(env.SITE_URL || ''),
       __TIMESTAMP__: JSON.stringify(timestamp),
       __HUMANS_WORD_CURATOR__: JSON.stringify(process.env.HUMANS_WORD_CURATOR || ''),
       __HUMANS_DEVELOPER_NAME__: JSON.stringify(process.env.HUMANS_DEVELOPER_NAME || ''),
@@ -120,20 +85,16 @@ export default defineConfig({
       __COLOR_PRIMARY__: JSON.stringify(process.env.COLOR_PRIMARY || '#b45309'),
       __COLOR_PRIMARY_LIGHT__: JSON.stringify(process.env.COLOR_PRIMARY_LIGHT || '#d97706'),
       __COLOR_PRIMARY_DARK__: JSON.stringify(process.env.COLOR_PRIMARY_DARK || '#78350f'),
-      __ENVIRONMENT__: JSON.stringify(process.env.NODE_ENV),
+      __ENVIRONMENT__: JSON.stringify(env.NODE_ENV),
       __GA_MEASUREMENT_ID__: JSON.stringify(process.env.GA_MEASUREMENT_ID),
       __GA_ENABLED__: process.env.GA_ENABLED === 'true',
       __SHOW_EMPTY_STATS__: process.env.SHOW_EMPTY_STATS === 'true',
-      __SOURCE_DIR__: JSON.stringify(process.env.SOURCE_DIR || ''),
+      __SOURCE_DIR__: JSON.stringify(env.SOURCE_DIR || ''),
       __WORD_DATA_PATH__: JSON.stringify(
-        process.env.SOURCE_DIR
-          ? `data/${process.env.SOURCE_DIR}/words`
-          : 'data/words',
+        env.SOURCE_DIR ? `data/${env.SOURCE_DIR}/words` : 'data/words',
       ),
       __SOCIAL_IMAGES_PATH__: JSON.stringify(
-        process.env.SOURCE_DIR
-          ? `public/${process.env.SOURCE_DIR}/images`
-          : 'public/images',
+        env.SOURCE_DIR ? `public/${env.SOURCE_DIR}/images` : 'public/images',
       ),
     },
     build: {
@@ -151,13 +112,17 @@ export default defineConfig({
     },
   },
   integrations: [
-    ...(process.env.SENTRY_ENABLED === 'true' ? [sentry({
-      sourceMapsUploadOptions: {
-        project: process.env.SENTRY_PROJECT,
-        org: process.env.SENTRY_ORG,
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      },
-    })] : []),
+    ...(env.SENTRY_ENABLED
+      ? [
+          sentry({
+            sourceMapsUploadOptions: {
+              project: process.env.SENTRY_PROJECT,
+              org: process.env.SENTRY_ORG,
+              authToken: process.env.SENTRY_AUTH_TOKEN,
+            },
+          }),
+        ]
+      : []),
     sitemap({
       lastmod: new Date(),
       filter: (page) => !page.endsWith('.txt'),
