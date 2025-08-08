@@ -114,46 +114,52 @@ export const countSyllables = (word: string): number => {
     return 0;
   }
 
-  const cleanWord = word.trim().toLowerCase();
+  const normalizedWord = word.trim().toLowerCase();
 
   // Handle single-letter words
-  if (cleanWord.length === 1) {
+  if (normalizedWord.length === 1) {
     return 1;
   }
 
   // Remove trailing silent e (but not if it's the only vowel)
-  let processedWord = cleanWord;
-  if (processedWord.length > 2 && processedWord.endsWith('e')) {
-    const beforeE = processedWord[processedWord.length - 2];
-    if (beforeE && !'aeiou'.includes(beforeE)) {
-      // Only remove silent e if there are other vowels in the word
-      const withoutE = processedWord.slice(0, -1);
-      if (/[aeiouy]/i.test(withoutE)) {
-        processedWord = withoutE;
+  const withoutSilentE = (() => {
+    if (normalizedWord.length > 2 && normalizedWord.endsWith('e')) {
+      const beforeE = normalizedWord[normalizedWord.length - 2];
+      if (beforeE && !'aeiou'.includes(beforeE)) {
+        const candidate = normalizedWord.slice(0, -1);
+        if (/[aeiouy]/i.test(candidate)) {
+          return candidate;
+        }
       }
     }
-  }
+    return normalizedWord;
+  })();
 
   // Handle words ending in -ed (usually silent unless preceded by d or t)
-  if (processedWord.endsWith('ed') && processedWord.length > 2) {
-    const beforeEd = processedWord[processedWord.length - 3];
-    if (beforeEd && !'dt'.includes(beforeEd)) {
-      processedWord = processedWord.slice(0, -2);
+  const withoutEd = (() => {
+    if (withoutSilentE.endsWith('ed') && withoutSilentE.length > 2) {
+      const beforeEd = withoutSilentE[withoutSilentE.length - 3];
+      if (beforeEd && !'dt'.includes(beforeEd)) {
+        return withoutSilentE.slice(0, -2);
+      }
     }
-  }
+    return withoutSilentE;
+  })();
 
   // Handle words ending in -es
-  if (processedWord.endsWith('es') && processedWord.length > 2) {
-    const beforeEs = processedWord[processedWord.length - 3];
-    if (beforeEs && 'sxzh'.includes(beforeEs)) {
-      // Keep the 'es' as it adds a syllable (like "boxes", "wishes")
-    } else {
-      processedWord = processedWord.slice(0, -2);
+  const withoutEs = (() => {
+    if (withoutEd.endsWith('es') && withoutEd.length > 2) {
+      const beforeEs = withoutEd[withoutEd.length - 3];
+      if (beforeEs && 'sxzh'.includes(beforeEs)) {
+        return withoutEd;
+      }
+      return withoutEd.slice(0, -2);
     }
-  }
+    return withoutEd;
+  })();
 
   // Handle y at the beginning (consonant) vs middle/end (vowel)
-  processedWord = processedWord.replace(/^y/, '');
+  const processedWord = withoutEs.replace(/^y/, '');
 
   // Count vowel groups (consecutive vowels count as one syllable)
   const vowelGroups = processedWord.match(/[aeiouy]+/gi) || [];
