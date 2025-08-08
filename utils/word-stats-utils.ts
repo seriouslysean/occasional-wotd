@@ -1,47 +1,78 @@
-import type { WordData } from '~types/word';
-import { YYYYMMDDToDate } from '~utils/date-utils';
+import type {
+  WordData,
+  WordLetterStatsResult,
+  WordStatsResult,
+  WordStreakStatsResult,
+} from '~types/word';
+import { dateToYYYYMMDD, YYYYMMDDToDate } from '~utils/date-utils';
+import {
+  countSyllables,
+  getConsonantCount,
+  getVowelCount,
+  getWordEndings,
+  hasAlphabeticalSequence,
+  hasDoubleLetters,
+  hasTripleLetters,
+  isAllConsonants,
+  isAllVowels,
+  isPalindrome,
+  isStartEndSame,
+} from '~utils/text-utils';
 
-// Text analysis functions needed by stats
-function isStartEndSame(word: string): boolean {
-  return word.length > 1 && word[0] === word[word.length - 1];
-}
+/**
+ * Analyzes word data to extract basic statistics including longest/shortest words and letter frequency
+ */
+export const getWordStats = (words: WordData[]): WordStatsResult => {
+  const emptyStats: WordStatsResult = {
+    longest: null,
+    shortest: null,
+    longestPalindrome: null,
+    shortestPalindrome: null,
+    letterFrequency: {},
+  };
 
-function hasDoubleLetters(word: string): boolean {
-  return /(.)(\1)/.test(word);
-}
+  return words.reduce((stats, wordData) => {
+    const word = wordData.word;
+    const length = word.length;
 
-function hasTripleLetters(word: string): boolean {
-  return /(.)(\1){2,}/.test(word);
-}
+    if (!stats.longest || length > stats.longest.length) {
+      stats.longest = { word, length };
+    }
+    if (!stats.shortest || length < stats.shortest.length) {
+      stats.shortest = { word, length };
+    }
 
-function hasAlphabeticalSequence(word: string): boolean {
-  const letters = word.toLowerCase().split('');
-  return letters.slice(0, -2).some((_, i) => {
-    const a = letters[i].charCodeAt(0);
-    const b = letters[i + 1].charCodeAt(0);
-    const c = letters[i + 2].charCodeAt(0);
-    return b === a + 1 && c === b + 1;
-  });
-}
+    if (isPalindrome(word)) {
+      if (!stats.longestPalindrome || length > stats.longestPalindrome.length) {
+        stats.longestPalindrome = { word, length };
+      }
+      if (!stats.shortestPalindrome || length < stats.shortestPalindrome.length) {
+        stats.shortestPalindrome = { word, length };
+      }
+    }
 
-function getWordEndings(word: string): string[] {
-  const endings = ['ing', 'ed', 'ly', 'ness', 'ful', 'less'];
-  return endings.filter(ending => word.endsWith(ending));
-}
+    const uniqueLetters = new Set(word.toLowerCase());
+    for (const letter of uniqueLetters) {
+      stats.letterFrequency[letter] = (stats.letterFrequency[letter] || 0) + 1;
+    }
 
-function isAllVowels(word: string): boolean {
-  return /^[aeiou]+$/i.test(word);
-}
+    return stats;
+  }, emptyStats);
+};
 
-function isAllConsonants(word: string): boolean {
-  return /^[^aeiou]+$/i.test(word);
-}
-
-function isPalindrome(word: string): boolean {
-  if (!word) return false;
-  const normalized = word.toLowerCase();
-  return normalized === normalized.split('').reverse().join('');
-}
+/**
+ * Converts letter frequency data into sorted statistics
+ */
+export const getLetterFrequencyStats = (
+  letterFrequency: Record<string, number>,
+): WordLetterStatsResult => {
+  if (Object.keys(letterFrequency).length === 0) {
+    return [];
+  }
+  return Object.entries(letterFrequency)
+    .filter(([letter]) => /^[a-z]$/i.test(letter))
+    .sort(([, a], [, b]) => b - a);
+};
 
 /**
  * Analyzes words for various letter patterns
@@ -157,6 +188,208 @@ export const areConsecutiveDays = (olderDate: string, newerDate: string): boolea
   
   const oneDayMs = 24 * 60 * 60 * 1000;
   return Math.abs(dNewer.getTime() - dOlder.getTime()) === oneDayMs;
+};
+
+/**
+ * Analyze word streaks to determine current and longest sequences
+ */
+export const getCurrentStreakStats = (words: WordData[]): WordStreakStatsResult => {
+  if (words.length === 0) {
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      isActive: false,
+    };
+  }
+
+  const sortedWords = [...words].sort((a, b) => b.date.localeCompare(a.date));
+  const today = new Date();
+  const todayString = dateToYYYYMMDD(today);
+  const yesterdayDate = new Date(today);
+  yesterdayDate.setDate(today.getDate() - 1);
+  const yesterdayString = dateToYYYYMMDD(yesterdayDate);
+
+  const mostRecentWord = sortedWords[0];
+  const isActive =
+    !!mostRecentWord &&
+    (mostRecentWord.date === todayString || mostRecentWord.date === yesterdayString);
+
+  const calculateCurrentStreak = () => {
+    if (!isActive || !mostRecentWord) {
+      return 0;
+    }
+
+    const streakData = {
+      count: 1,
+      lastDate: mostRecentWord.date,
+    };
+
+    for (const word of sortedWords.slice(1)) {
+      if (areConsecutiveDays(word.date, streakData.lastDate)) {
+        streakData.count++;
+        streakData.lastDate = word.date;
+      } else {
+        break;
+      }
+    }
+
+    return streakData.count;
+  };
+
+  const calculateLongestStreak = () => {
+    if (sortedWords.length <= 1) {
+      return sortedWords.length;
+    }
+
+    const streakData = {
+      longest: 0,
+      current: 1,
+    };
+
+    for (const [index, word] of sortedWords.entries()) {
+      if (index === 0) {
+        continue;
+      }
+
+      if (areConsecutiveDays(word.date, sortedWords[index - 1].date)) {
+        streakData.current++;
+      } else {
+        streakData.longest = Math.max(streakData.longest, streakData.current);
+        streakData.current = 1;
+      }
+    }
+
+    return Math.max(streakData.longest, streakData.current);
+  };
+
+  return {
+    currentStreak: calculateCurrentStreak(),
+    longestStreak: calculateLongestStreak(),
+    isActive,
+  };
+};
+
+/**
+ * Get the words that make up the longest streak in the collection
+ */
+export const getLongestStreakWords = (words: WordData[]): WordData[] => {
+  if (words.length <= 1) {
+    return words;
+  }
+
+  const sortedWords = [...words].sort((a, b) => b.date.localeCompare(a.date));
+
+  const { longestStreak } = sortedWords.slice(1).reduce(
+    ({ longestStreak, currentStreak, previousWord }, word) => {
+      const isConsecutive = areConsecutiveDays(word.date, previousWord.date);
+      const newCurrentStreak = isConsecutive ? [...currentStreak, word] : [word];
+      const newLongestStreak =
+        newCurrentStreak.length > longestStreak.length
+          ? newCurrentStreak
+          : longestStreak;
+
+      return {
+        longestStreak: newLongestStreak,
+        currentStreak: newCurrentStreak,
+        previousWord: word,
+      };
+    },
+    {
+      longestStreak: [sortedWords[0]],
+      currentStreak: [sortedWords[0]],
+      previousWord: sortedWords[0],
+    },
+  );
+
+  return longestStreak.reverse();
+};
+
+/**
+ * Finds words with the most and least syllables
+ */
+export const getSyllableStats = (
+  words: WordData[],
+): { mostSyllables: WordData | null; leastSyllables: WordData | null } => {
+  if (words.length === 0) {
+    return {
+      mostSyllables: null,
+      leastSyllables: null,
+    };
+  }
+
+  return words.reduce(
+    (acc, word) => {
+      const syllables = countSyllables(word.word);
+
+      if (!acc.mostSyllables || syllables > countSyllables(acc.mostSyllables.word)) {
+        acc.mostSyllables = word;
+      }
+
+      if (
+        !acc.leastSyllables ||
+        syllables < countSyllables(acc.leastSyllables.word)
+      ) {
+        acc.leastSyllables = word;
+      }
+
+      return acc;
+    },
+    {
+      mostSyllables: words[0],
+      leastSyllables: words[0],
+    },
+  );
+};
+
+/**
+ * Finds words with the most vowels and consonants
+ */
+export const getLetterTypeStats = (
+  words: WordData[],
+): { mostVowels: WordData | null; mostConsonants: WordData | null } => {
+  if (words.length === 0) {
+    return {
+      mostVowels: null,
+      mostConsonants: null,
+    };
+  }
+
+  return words.reduce(
+    (acc, word) => {
+      const vowelCount = getVowelCount(word.word);
+      const consonantCount = getConsonantCount(word.word);
+
+      if (!acc.mostVowels || vowelCount > getVowelCount(acc.mostVowels.word)) {
+        acc.mostVowels = word;
+      }
+
+      if (
+        !acc.mostConsonants ||
+        consonantCount > getConsonantCount(acc.mostConsonants.word)
+      ) {
+        acc.mostConsonants = word;
+      }
+
+      return acc;
+    },
+    {
+      mostVowels: words[0],
+      mostConsonants: words[0],
+    },
+  );
+};
+
+/**
+ * Helper function to find a word's date from a list of words
+ */
+export const findWordDate = (
+  words: WordData[],
+  targetWord: string,
+): string | undefined => {
+  if (!targetWord) {
+    return undefined;
+  }
+  return words.find(w => w?.word === targetWord)?.date;
 };
 
 /**

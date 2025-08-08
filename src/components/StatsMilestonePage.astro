@@ -6,7 +6,7 @@ import Layout from '~layouts/Layout.astro';
 import type { WordMilestoneItem } from '~types/word';
 import { getPageMetadata } from '~utils-client/page-metadata.ts';
 import { STRUCTURED_DATA_TYPE } from '~utils-client/schema-utils.ts';
-import { formatWordCount } from '~utils-client/text-utils';
+import { formatWordCount } from '~utils/text-utils';
 
 interface Props {
   words: WordMilestoneItem[];

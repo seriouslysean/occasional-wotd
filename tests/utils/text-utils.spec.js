@@ -13,7 +13,7 @@ import {
   isAllVowels,
   isPalindrome,
   isStartEndSame,
-} from '~utils-client/text-utils';
+} from '~utils/text-utils';
 
 describe('text-utils', () => {
   describe('getVowelCount', () => {
@@ -91,8 +91,8 @@ describe('text-utils', () => {
       expect(countSyllables('beautiful')).toBe(3); // beau-ti-ful
     });
 
-    it('handles special cases', () => {
-      expect(countSyllables('ululated')).toBe(4); // special case defined in code
+    it('handles tricky vowel cases', () => {
+      expect(countSyllables('ululated')).toBe(4);
       expect(countSyllables('the')).toBe(1); // ends with 'e' but still 1 syllable
       expect(countSyllables('ate')).toBe(1); // ends with 'e'
     });

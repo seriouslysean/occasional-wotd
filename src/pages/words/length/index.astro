@@ -5,7 +5,7 @@ import WordSection from '~components/WordSection.astro';
 import Layout from '~layouts/Layout.astro';
 import { getPageMetadata } from '~utils-client/page-metadata.ts';
 import { STRUCTURED_DATA_TYPE } from '~utils-client/schema-utils.ts';
-import { formatWordCount } from '~utils-client/text-utils';
+import { formatWordCount } from '~utils/text-utils';
 import { getWordsFromCollection, groupWordsByLength } from '~utils-client/word-data-utils';
 
 const allWords = await getWordsFromCollection();
