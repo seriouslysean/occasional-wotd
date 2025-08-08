@@ -4,21 +4,15 @@ import WordDescription from '~components/WordDescription.astro';
 import Layout from '~layouts/Layout.astro';
 import { getPageMetadata } from '~astro-utils/page-metadata.ts';
 
-const notFoundWord = {
-  word: '404',
-  partOfSpeech: 'noun',
-  definition: 'A web page that cannot be found; an error indicating the requested content does not exist.',
-};
-
-const { title, description } = getPageMetadata(Astro.url.pathname);
+const { title, description, partOfSpeech } = getPageMetadata('/404');
 ---
 
 <Layout title={title} description={description}>
   <main class="not-found">
-    <Heading level={1} text={notFoundWord.word} />
+    <Heading level={1} text={title} />
     <WordDescription
-      partOfSpeech={notFoundWord.partOfSpeech}
-      definition={notFoundWord.definition}
+      partOfSpeech={partOfSpeech}
+      definition={description}
     />
   </main>
 </Layout>
