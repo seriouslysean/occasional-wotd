@@ -6,20 +6,20 @@ import SiteLink from '~components/SiteLink.astro';
 import WordLink from '~components/WordLink.astro';
 import Layout from '~layouts/Layout.astro';
 import { getPageMetadata } from '~utils-client/page-metadata.ts';
-import { countSyllables, getConsonantCount, getVowelCount } from '~utils-client/text-utils';
+import { countSyllables, getConsonantCount, getVowelCount } from '~utils/text-utils';
 import { getAvailableLengths } from '~utils-client/word-data-utils';
 import {
   findWordDate,
   getChronologicalMilestones,
   getCurrentStreakStats,
   getLetterPatternStats,
-  getLetterStats,
+  getLetterFrequencyStats,
   getLetterTypeStats,
   getPatternStats,
   getSyllableStats,
   getWordEndingStats,
   getWordStats,
-} from '~utils-client/word-stats-utils';
+} from '~utils/word-stats-utils';
 
 const wordsCollection = await getCollection('words');
 const words = wordsCollection
@@ -34,7 +34,7 @@ const latestWord = totalWords > 0 ? words[words.length - 1] : null;
 const lengthCount = getAvailableLengths(words).length;
 
 const wordStats = getWordStats(words);
-const letterStats = getLetterStats(wordStats.letterFrequency);
+const letterStats = getLetterFrequencyStats(wordStats.letterFrequency);
 const letterPatterns = getLetterPatternStats(words);
 const wordEndings = getWordEndingStats(words);
 const streakStats = getCurrentStreakStats(words);
