@@ -3,7 +3,8 @@
  * Generates breadcrumb navigation data from URL pathnames
  */
 
-import { getPageMetadata } from './page-metadata-utils';
+import { getPageMetadata } from '~utils/page-metadata-utils';
+import { stripBasePath } from '~astro-utils/url-utils';
 
 export interface BreadcrumbItem {
   label: string;
@@ -13,28 +14,16 @@ export interface BreadcrumbItem {
 /**
  * Generate breadcrumb items from a URL pathname
  * @param pathname - The URL pathname to parse
- * @param basePath - The base path to filter out (e.g., from BASE_PATH env var)
  * @returns Array of breadcrumb items with labels and hrefs
  */
-export function generateBreadcrumbs(pathname: string, basePath?: string): BreadcrumbItem[] {
-  // Clean the pathname - remove leading/trailing slashes
-  const cleanPath = pathname.replace(/^\/|\/$/g, '');
-  
-  // Remove base path if provided
-  const pathWithoutBase = basePath && basePath !== '/' 
-    ? cleanPath.replace(new RegExp(`^${basePath.replace(/^\/|\/$/g, '')}`), '').replace(/^\//, '')
-    : cleanPath;
-  
-  // Return empty array for home page
-  if (!pathWithoutBase) {
+export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
+  const pathWithoutBase = stripBasePath(pathname);
+
+  if (!pathWithoutBase || pathWithoutBase === 'home') {
     return [];
   }
-  
+
   const segments = pathWithoutBase.split('/').filter(Boolean);
-  
-  if (segments.length === 0) {
-    return [];
-  }
   
   // Build breadcrumbs progressively
   const breadcrumbs: BreadcrumbItem[] = [

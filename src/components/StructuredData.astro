@@ -75,7 +75,7 @@ if (structuredDataType === STRUCTURED_DATA_TYPE.WORD_SINGLE && word) {
 }
 
 // Add breadcrumb schema for non-home pages
-const breadcrumbs = generateBreadcrumbs(Astro.url.pathname, import.meta.env.BASE_PATH);
+const breadcrumbs = generateBreadcrumbs(Astro.url.pathname);
 const breadcrumbSchema = getBreadcrumbSchema(breadcrumbs);
 if (breadcrumbSchema) {
   schemas.push(breadcrumbSchema);

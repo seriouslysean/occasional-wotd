@@ -19,7 +19,7 @@ import {
 describe('utils', () => {
   describe('getUrl', () => {
     beforeEach(() => {
-      vi.stubEnv('BASE_PATH', '/');
+      vi.stubEnv('BASE_URL', '/');
     });
 
     it('handles paths with default base path', () => {
@@ -27,17 +27,17 @@ describe('utils', () => {
     });
 
     it('handles paths with custom base path', () => {
-      vi.stubEnv('BASE_PATH', '/blog');
+      vi.stubEnv('BASE_URL', '/blog');
       expect(getUrl('/20240319')).toBe('/blog/20240319');
     });
 
     it('handles paths with custom base path with trailing slash', () => {
-      vi.stubEnv('BASE_PATH', '/blog/');
+      vi.stubEnv('BASE_URL', '/blog/');
       expect(getUrl('/20240319')).toBe('/blog/20240319');
     });
 
     it('handles empty or undefined base path', () => {
-      vi.stubEnv('BASE_PATH', '');
+      vi.stubEnv('BASE_URL', '');
       expect(getUrl('/20240319')).toBe('/20240319');
     });
 
@@ -62,20 +62,20 @@ describe('utils', () => {
     });
 
     it('ignores SITE_URL when building relative URLs', () => {
-      vi.stubEnv('BASE_PATH', '/blog');
+      vi.stubEnv('BASE_URL', '/blog');
       vi.stubEnv('SITE_URL', 'https://example.com');
       expect(getUrl('/words/hello')).toBe('/blog/words/hello');
     });
 
     it('preserves case for base path and path', () => {
-      vi.stubEnv('BASE_PATH', '/Blog');
+      vi.stubEnv('BASE_URL', '/Blog');
       expect(getUrl('/ABC')).toBe('/Blog/ABC');
     });
   });
 
   describe('getFullUrl', () => {
     beforeEach(() => {
-      vi.stubEnv('BASE_PATH', '/');
+      vi.stubEnv('BASE_URL', '/');
       vi.stubEnv('SITE_URL', 'https://example.com');
     });
 
@@ -84,7 +84,7 @@ describe('utils', () => {
     });
 
     it('handles subdirectory deployments correctly', () => {
-      vi.stubEnv('BASE_PATH', '/vocab');
+      vi.stubEnv('BASE_URL', '/vocab');
       expect(getFullUrl('/words/hello')).toBe('https://example.com/vocab/words/hello');
     });
 

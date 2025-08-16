@@ -7,7 +7,7 @@ import { logger } from '~astro-utils/logger';
  * @returns Normalized URL path
  */
 export const getUrl = (path = '/'): string => {
-  const baseUrl = import.meta.env.BASE_PATH || '/';
+  const baseUrl = import.meta.env.BASE_URL || '/';
 
   if (!path || path === '') {
     return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -66,7 +66,7 @@ export const getWordUrl = (word: string): string => {
  * @returns Pathname relative to the site root
  */
 export const stripBasePath = (pathname: string): string => {
-  const base = (import.meta.env.BASE_PATH || '').replace(/\/+$/, '');
+  const base = (import.meta.env.BASE_URL || '').replace(/\/+$/, '');
   const hasBase = base && pathname.toLowerCase().startsWith(base.toLowerCase());
   const withoutBase = hasBase ? pathname.slice(base.length) : pathname;
   const clean = withoutBase.replace(/^\/+|\/+$/g, '');

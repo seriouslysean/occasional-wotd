@@ -161,8 +161,8 @@ describe('page-metadata-utils', () => {
   });
 
   describe('getPageMetadata wrapper', () => {
-    it('handles BASE_PATH prefixes', async () => {
-      vi.stubEnv('BASE_PATH', '/vocab');
+    it('handles BASE_URL prefixes', async () => {
+      vi.stubEnv('BASE_URL', '/vocab');
       const { getPageMetadata: getPageMetadataWrapper } = await import(
         '~astro-utils/page-metadata'
       );
@@ -175,8 +175,8 @@ describe('page-metadata-utils', () => {
       });
     });
 
-    it('handles BASE_PATH with different case and trailing slash', async () => {
-      vi.stubEnv('BASE_PATH', '/Vocab/');
+    it('handles BASE_URL with different case and trailing slash', async () => {
+      vi.stubEnv('BASE_URL', '/Vocab/');
       vi.resetModules();
       const { getPageMetadata: getPageMetadataWrapper } = await import(
         '~astro-utils/page-metadata'
