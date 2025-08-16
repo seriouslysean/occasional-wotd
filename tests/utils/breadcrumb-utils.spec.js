@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-import { generateBreadcrumbs } from '../../utils/breadcrumb-utils';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { generateBreadcrumbs } from '~utils/breadcrumb-utils';
 
 // Mock the page metadata utility
-vi.mock('../../utils/page-metadata-utils', () => ({
+vi.mock('~utils/page-metadata-utils', () => ({
   getPageMetadata: vi.fn((path) => {
     const metadataMap = {
       '/words': { title: 'All Words' },
@@ -20,6 +20,9 @@ vi.mock('../../utils/page-metadata-utils', () => ({
 }));
 
 describe('generateBreadcrumbs', () => {
+  beforeEach(() => {
+    vi.stubEnv('BASE_URL', '/');
+  });
   it('should return empty array for home page', () => {
     expect(generateBreadcrumbs('/')).toEqual([]);
     expect(generateBreadcrumbs('')).toEqual([]);
@@ -53,12 +56,14 @@ describe('generateBreadcrumbs', () => {
   });
 
   it('should handle base path correctly', () => {
-    const result = generateBreadcrumbs('/blog/words/hello', '/blog');
+    vi.stubEnv('BASE_URL', '/blog');
+    const result = generateBreadcrumbs('/blog/words/hello');
     expect(result).toEqual([
       { label: 'home', href: '/' },
       { label: 'all words', href: '/words' },
       { label: 'hello', href: '/words/hello' }
     ]);
+    vi.stubEnv('BASE_URL', '/');
   });
 
   it('should handle letter browsing pages', () => {
