@@ -20,7 +20,8 @@
       "Bash(cat:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "WebFetch(domain:astro.build)"
     ],
     "deny": []
   }
