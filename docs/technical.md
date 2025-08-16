@@ -152,6 +152,10 @@ export const getWordsForYear = (year: string) => getWordsByYear(year, allWords);
 - **Dictionary Validation**: Words must exist in configured dictionary service
 - **Format Validation**: Strict YYYYMMDD date format enforcement
 
+### Word List Endpoint
+A static JSON file is generated at `/words.json` containing an array of word names (strings only).
+Client-side features can fetch this list for random navigation or search without requiring a runtime API.
+
 ## Tools & CLI
 
 ### Unified Tool System
