@@ -1,9 +1,12 @@
-import { showHelp } from '~tools/help-utils';
+import { COMMON_ENV_DOCS, showHelp } from '~tools/help-utils';
 import { findExistingWord, generateGenericShareImage, generateShareImage, getAllWords } from '~tools/utils';
 import { getAllPageMetadata } from '~utils/page-metadata-utils';
 
 const HELP_TEXT = `
 Generate Images Tool
+
+Generates social media share images (1200x630px PNG) for words and pages.
+Creates optimized images with custom branding and gradients from SVG templates.
 
 Usage:
   npm run tool:local tools/generate-images.ts [options]
@@ -24,17 +27,11 @@ Examples:
   npm run tool:generate-images --word serendipity # Generate image for specific word
   npm run tool:generate-images --page stats       # Generate image for stats page
 
-Environment Variables (for GitHub workflows):
-  SOURCE_DIR                 Data source directory (default: demo)
-  SITE_TITLE                 Site title for images
-  COLOR_PRIMARY             Primary color for gradients
-  COLOR_PRIMARY_LIGHT       Light primary color
-  COLOR_PRIMARY_DARK        Dark primary color
-
-Requirements:
-  - Word must exist in data files for word images
-  - Required environment variables must be set
-  - Output directory will be created if it doesn't exist
+Output:
+  Word images:    public/images/social/YYYY/YYYYMMDD-word.png
+  Generic images: public/images/social/pages/<path>.png
+  Format:         1200x630px PNG, 90% quality, 128-color palette
+${COMMON_ENV_DOCS}
 `;
 
 /**

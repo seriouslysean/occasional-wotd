@@ -1,24 +1,44 @@
 #!/usr/bin/env node
 
-/**
- * Search Engine Ping Service
- *
- * This script pings search engines to notify them about sitemap updates.
- * Run this script after deploying new content to help search engines discover changes faster.
- *
- * Usage: node ping-search-engines.js [--site-url URL] [--deployed-hash HASH] [--dry-run] [--force]
- *
- * Options:
- *   --site-url      The base URL of the deployed site (e.g. https://example.com)
- *   --deployed-hash The hash of the deployed content (for change detection)
- *   --dry-run       Don't actually ping services, just show what would be pinged
- *   --force         Ping regardless of content change detection
- */
-
 import http from 'http';
 import https from 'https';
 import { URL } from 'url';
 
+import { COMMON_ENV_DOCS, showHelp } from '~tools/help-utils';
+
+const HELP_TEXT = `
+Ping Search Engines Tool
+
+Notifies search engines about sitemap updates to improve content discovery.
+Uses Ping-O-Matic service to ping Google, Bing, and other search engines.
+
+Usage:
+  npm run tool:local tools/ping-search-engines.ts [options]
+  npm run tool:ping-search-engines [options]
+
+Options:
+  --site-url <url>           Base URL of the deployed site (required)
+  --deployed-hash <hash>     Hash of deployed content for change detection
+  --dry-run                  Preview what would be pinged without actually pinging
+  --force                    Ping regardless of change detection
+  -h, --help                 Show this help message
+
+Examples:
+  npm run tool:ping-search-engines --site-url "https://example.com"
+  npm run tool:ping-search-engines --site-url "https://example.com" --dry-run
+  npm run tool:ping-search-engines --site-url "https://example.com" --deployed-hash "abc123" --force
+
+Change Detection:
+  - Fetches /health.txt from site to compare words_hash
+  - Only pings if content has changed (hash mismatch)
+  - Use --force to bypass change detection
+
+Services Notified:
+  - Google (via Ping-O-Matic)
+  - Bing (via Ping-O-Matic)
+  - Other aggregators supported by Ping-O-Matic
+${COMMON_ENV_DOCS}
+`;
 
 /**
  * Gets the value for a CLI flag from an argument array
@@ -36,6 +56,13 @@ function getArgValue(flag: string, argsArr: string[]): string | undefined {
 
 // Parse command line arguments
 const args = process.argv.slice(2);
+
+// Check for help flag
+if (args.includes('--help') || args.includes('-h') || args.length === 0) {
+  showHelp(HELP_TEXT);
+  process.exit(0);
+}
+
 const isDryRun = args.includes('--dry-run');
 const isForce = args.includes('--force');
 
@@ -44,6 +71,7 @@ const deployedHashArg = getArgValue('--deployed-hash', args);
 
 if (!siteUrlArg) {
   console.error('Site URL required');
+  showHelp(HELP_TEXT);
   process.exit(1);
 }
 

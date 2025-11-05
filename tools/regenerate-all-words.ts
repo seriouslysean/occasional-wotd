@@ -175,7 +175,8 @@ async function regenerateAllWords(options: RegenerateOptions): Promise<void> {
 const HELP_TEXT = `
 Regenerate All Words Tool
 
-Regenerates all word files with fresh dictionary data, supporting flexible JSON field extraction.
+Refreshes all word files with fresh dictionary data from the configured API.
+Useful for updating definitions, fixing formatting, or migrating to a new adapter.
 
 Usage:
   npm run tool:local tools/regenerate-all-words.ts [options]
@@ -185,32 +186,30 @@ Options:
   --word-field <path>        JSON path to word field (default: "word")
   --date-field <path>        JSON path to date field (default: "date")
   --dry-run                  Preview what would be regenerated without doing it
-  --force                    Skip confirmation prompts
-  --timeout <ms>             Timeout between API calls (default: 1000ms)
-  --rate-limit-timeout <ms>  Timeout when rate limit hit (default: 65000ms)
-  --batch-size <num>         Words per batch (default: 4)
-  --batch-timeout <ms>       Timeout between batches (default: 10000ms)
+  --force                    Skip confirmation prompts and execute regeneration
+  --timeout <ms>             Delay between API calls (default: 4000ms)
+  --rate-limit-timeout <ms>  Delay when rate limit hit (default: 3600000ms)
+  --batch-size <num>         Words per batch (default: 10)
+  --batch-timeout <ms>       Delay between batches (default: 60000ms)
   -h, --help                 Show this help message
 
-Field Path Examples:
-  "word"                     Direct field access
-  "metadata.term"            Nested field access
-  "data.0.word"              Array element access
-
 Examples:
-  npm run tool:regenerate-all-words --dry-run
-  npm run tool:regenerate-all-words --word-field "metadata.term" --date-field "dateCode" --force
-  npm run tool:regenerate-all-words --timeout 2000 --batch-size 3 --force
+  npm run tool:regenerate-all-words --dry-run                    # Preview changes
+  npm run tool:regenerate-all-words --force                      # Regenerate all words
+  npm run tool:regenerate-all-words --timeout 2000 --force       # Faster API calls
+  npm run tool:regenerate-all-words --batch-size 5 --force       # Smaller batches
 
-Environment Variables (for GitHub workflows):
-  DICTIONARY_ADAPTER         Dictionary API to use (required)
-  WORDNIK_API_KEY           API key for dictionary access (required)
-  SOURCE_DIR                Data source directory (default: demo)
+Rate Limiting:
+  - Automatically retries with exponential backoff on 429 errors
+  - Max 3 retries: 30s, 60s, 120s
+  - Processes words in batches to avoid overwhelming the API
+  - Default settings: 10 words/batch, 4s between calls, 60s between batches
 
-Note:
-  All dates are normalized to YYYYMMDD format (no dashes).
-  This tool will overwrite existing word files with fresh dictionary data.
-  Use --dry-run first to preview changes.
+Safety Features:
+  - Requires --force flag to execute (prevents accidental runs)
+  - Supports --dry-run to preview changes
+  - Logs all successes and failures
+  - Preserves files even if API call fails
 ${COMMON_ENV_DOCS}
 `;
 

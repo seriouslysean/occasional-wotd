@@ -73,25 +73,41 @@ async function addWord(input: string, date: string, overwrite: boolean = false, 
       process.exit(1);
     }
 
-    // Check if file already exists for the target date
-    const existing = checkExistingWord(targetDate);
-    if (existing && !overwrite) {
-      console.error('Word already exists for this date', {
-        date: existing.date,
-        existingWord: existing.word,
-      });
-      process.exit(1);
-    }
-
-    // Check if word already exists anywhere else in the system (always enforce global uniqueness)
+    // Optimized check: Single pass to find if word exists globally
+    // This replaces separate checks for date and word existence
     const existingWordByName = findExistingWord(word);
-    if (existingWordByName && existingWordByName.date !== targetDate) {
-      console.error('Word already exists for different date', {
-        word: word,
-        existingDate: existingWordByName.date,
-        requestedDate: targetDate,
-      });
-      process.exit(1);
+
+    if (existingWordByName) {
+      // Word exists somewhere in the system
+      if (existingWordByName.date === targetDate) {
+        // Word exists for the same date
+        if (!overwrite) {
+          console.error('Word already exists for this date', {
+            date: existingWordByName.date,
+            existingWord: existingWordByName.word,
+          });
+          process.exit(1);
+        }
+        // If overwrite is true, we'll proceed to overwrite
+      } else {
+        // Word exists for a different date - always enforce global uniqueness
+        console.error('Word already exists for different date', {
+          word: word,
+          existingDate: existingWordByName.date,
+          requestedDate: targetDate,
+        });
+        process.exit(1);
+      }
+    } else if (!overwrite) {
+      // Word doesn't exist globally, but check if a different word exists for the target date
+      const existingForDate = checkExistingWord(targetDate);
+      if (existingForDate) {
+        console.error('A different word already exists for this date', {
+          date: targetDate,
+          existingWord: existingForDate.word,
+        });
+        process.exit(1);
+      }
     }
 
     // Use shared word creation logic
@@ -110,6 +126,9 @@ async function addWord(input: string, date: string, overwrite: boolean = false, 
 const HELP_TEXT = `
 Add Word Tool
 
+Adds a new word to the collection with automatic dictionary lookup and validation.
+Enforces global word uniqueness and prevents future-dated entries.
+
 Usage:
   npm run tool:local tools/add-word.ts <word> [date] [options]
   npm run tool:add-word <word> [date] [options]
@@ -119,7 +138,7 @@ Arguments:
   date    Date in YYYYMMDD format (optional, defaults to today)
 
 Options:
-  -o, --overwrite       Overwrite existing word if it exists
+  -o, --overwrite       Overwrite existing word for the same date
   -p, --preserve-case   Preserve original capitalization (default: converts to lowercase)
   -h, --help            Show this help message
 
@@ -130,15 +149,12 @@ Examples:
   npm run tool:add-word "Japan" --preserve-case
   npm run tool:add-word "PB&J" "20250101" --preserve-case
 
-Environment Variables (for GitHub workflows):
-  DICTIONARY_ADAPTER         Dictionary API to use (required)
-  WORDNIK_API_KEY           API key for dictionary access (required)
-  SOURCE_DIR                Data source directory (default: demo)
-
-Requirements:
-  - Word must exist in dictionary
-  - Date must be today or in the past (YYYYMMDD format)
-  - Tool prevents duplicate words unless --overwrite is used
+Validation Rules:
+  - Word must exist in the configured dictionary API
+  - Date must be today or in the past (no future dates)
+  - Each word can only appear once globally across all dates
+  - Each date can only have one word (use --overwrite to replace)
+  - Words are converted to lowercase unless --preserve-case is used
 ${COMMON_ENV_DOCS}
 `;
 

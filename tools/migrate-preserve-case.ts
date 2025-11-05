@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { showHelp } from '~tools/help-utils';
+import { COMMON_ENV_DOCS, showHelp } from '~tools/help-utils';
 import { getWordFiles } from '~tools/utils';
 import type { WordData } from '~types';
 
@@ -95,24 +95,33 @@ async function migrateAllWords(): Promise<void> {
 }
 
 const HELP_TEXT = `
-PreserveCase Field Migration Tool
+Migrate PreserveCase Field Tool
 
-This is a one-time migration script to add the preserveCase field to existing word files.
-Words containing uppercase characters will automatically be marked with preserveCase: true.
+One-time migration script to add the preserveCase field to existing word files.
+Automatically detects words requiring special capitalization and marks them accordingly.
 
 Usage:
   npm run tool:local tools/migrate-preserve-case.ts
+  npm run tool:migrate-preserve-case
 
-What it does:
-  - Scans all word JSON files in the data directory
-  - Adds "preserveCase": true for words containing uppercase characters
-  - Adds "preserveCase": false for words without uppercase characters
-  - Skips files that already have the preserveCase field
-  - Preserves all other data and formatting
+Migration Logic:
+  - Scans all word JSON files in the configured data directory
+  - Sets preserveCase: true for words containing uppercase characters
+  - Sets preserveCase: false for all-lowercase words
+  - Skips files that already have the correct preserveCase value
+  - Preserves all other data and maintains JSON formatting
 
-This script is safe to run multiple times - it will skip files that have already been migrated.
+Safety Features:
+  - Idempotent: Safe to run multiple times without side effects
+  - Non-destructive: Only adds/updates the preserveCase field
+  - Detailed logging: Shows which files were updated vs. skipped
+  - Error handling: Continues processing even if individual files fail
 
-After running this migration in all downstream repos, this script can be safely deleted.
+Example Output:
+  Migrated: Japan (20240101) -> preserveCase: true
+  Migrated: serendipity (20240102) -> preserveCase: false
+  Skipped: ubiquitous (20240103) -> already has preserveCase field
+${COMMON_ENV_DOCS}
 `;
 
 // Get command line arguments
