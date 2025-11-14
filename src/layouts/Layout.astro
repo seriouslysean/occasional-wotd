@@ -184,6 +184,66 @@ const wordSchemaData = word ? (() => {
 		window.app = buildData;
 	  }
 	</script>
+
+	<!-- Theme Loader -->
+	<script is:inline define:vars={{
+		themeFebruary: __THEME_FEBRUARY_ENABLED__,
+		themeForcedTheme: __THEME_FORCE_ENABLE__,
+		basePath: __BASE_PATH__
+	}}>
+	  (function() {
+		// Check for URL parameter override (for testing)
+		const urlParams = new URLSearchParams(window.location.search);
+		const urlTheme = urlParams.get('theme');
+		const validThemes = ['february'];
+
+		let activeTheme = null;
+
+		// Priority 1: URL parameter (testing)
+		if (urlTheme && validThemes.includes(urlTheme)) {
+		  activeTheme = urlTheme;
+		}
+		// Priority 2: Forced theme (demo/dev ENV)
+		else if (themeForcedTheme && validThemes.includes(themeForcedTheme)) {
+		  activeTheme = themeForcedTheme;
+		}
+		// Priority 3: Date-based detection
+		else {
+		  const now = new Date();
+		  const month = now.getMonth() + 1; // 0-indexed to 1-indexed
+
+		  if (month === 2 && themeFebruary) {
+			activeTheme = 'february';
+		  }
+		}
+
+		// Load theme if active
+		if (activeTheme) {
+		  const link = document.createElement('link');
+		  link.rel = 'stylesheet';
+		  link.href = `${basePath}/styles/themes/${activeTheme}.css`;
+		  document.head.appendChild(link);
+
+		  // Special handling for February theme (generate hearts)
+		  if (activeTheme === 'february') {
+			link.onload = function() {
+			  const heartCount = 8;
+			  const hearts = ['♥', '♡']; // Filled and outline hearts
+
+			  for (let i = 0; i < heartCount; i++) {
+				const heart = document.createElement('div');
+				heart.className = 'theme-heart';
+				heart.textContent = hearts[i % hearts.length];
+				heart.style.left = Math.random() * 100 + '%';
+				heart.style.animationDelay = -Math.random() * 60 + 's'; // Stagger start times
+				heart.style.fontSize = (15 + Math.random() * 10) + 'px'; // Vary size slightly
+				document.body.appendChild(heart);
+			  }
+			};
+		  }
+		}
+	  })();
+	</script>
   </body>
 </html>
 
