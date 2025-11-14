@@ -1,0 +1,68 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: ['main']
+  push:
+    branches: ['main']
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site with demo data
+        run: npm run build
+        env:
+          SOURCE_DIR: demo
+          SITE_URL: http://localhost:4321
+          SITE_TITLE: Demo Word of the Day
+          SITE_DESCRIPTION: A demo word of the day site
+          SITE_ID: demo-wotd
+
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          SOURCE_DIR: demo
+
+      - name: Wait for server to be ready
+        run: |
+          echo "Waiting for preview server..."
+          npx wait-on http://localhost:4321 --timeout 60000
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:4321'
+          wait-on-timeout: 60
+          browser: chrome
+          config: baseUrl=http://localhost:4321
+
+      - name: Upload Cypress screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
