@@ -1,0 +1,280 @@
+---
+import { t } from '~utils/i18n-utils';
+
+const { class: className, ...attrs } = Astro.props;
+---
+
+<div class={`word-search ${className || ''}`} {...attrs}>
+  <div class="word-search__container">
+    <label for="word-search-input" class="word-search__label">
+      {t('browse.search_label')}
+    </label>
+    <input
+      type="text"
+      id="word-search-input"
+      class="word-search__input"
+      placeholder={t('browse.search_placeholder')}
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <div id="word-search-results" class="word-search__results" aria-live="polite"></div>
+  </div>
+  <noscript>
+    <p class="word-search__noscript">
+      {t('browse.search')} requires JavaScript. <a href="/word">View all words</a> instead.
+    </p>
+  </noscript>
+</div>
+
+<script>
+import { getUrl, getWordUrl } from '~astro-utils/url-utils';
+
+const wordListCache = { data: null as string[] | null };
+const MAX_RESULTS = 10;
+
+async function loadWords() {
+  if (wordListCache.data) return wordListCache.data;
+
+  try {
+    const response = await fetch(getUrl('/words.json'));
+    if (!response.ok) throw new Error('Failed to fetch words');
+    wordListCache.data = await response.json();
+    return wordListCache.data;
+  } catch (error) {
+    console.error('Error loading words:', error);
+    return [];
+  }
+}
+
+function fuzzySearch(query: string, words: string[]): string[] {
+  if (!query) return [];
+
+  const normalizedQuery = query.toLowerCase().trim();
+
+  // Exact matches first
+  const exactMatches: string[] = [];
+  const startsWithMatches: string[] = [];
+  const containsMatches: string[] = [];
+
+  for (const word of words) {
+    const normalizedWord = word.toLowerCase();
+
+    if (normalizedWord === normalizedQuery) {
+      exactMatches.push(word);
+    } else if (normalizedWord.startsWith(normalizedQuery)) {
+      startsWithMatches.push(word);
+    } else if (normalizedWord.includes(normalizedQuery)) {
+      containsMatches.push(word);
+    }
+
+    // Stop early if we have enough results
+    if (exactMatches.length + startsWithMatches.length + containsMatches.length >= MAX_RESULTS * 2) {
+      break;
+    }
+  }
+
+  return [...exactMatches, ...startsWithMatches, ...containsMatches].slice(0, MAX_RESULTS);
+}
+
+function renderResults(results: string[], query: string) {
+  const resultsContainer = document.getElementById('word-search-results');
+  if (!resultsContainer) return;
+
+  if (!query) {
+    resultsContainer.innerHTML = '';
+    resultsContainer.style.display = 'none';
+    return;
+  }
+
+  if (results.length === 0) {
+    resultsContainer.innerHTML = `
+      <div class="word-search__no-results">
+        no words found matching "${query}"
+      </div>
+    `;
+    resultsContainer.style.display = 'block';
+    return;
+  }
+
+  const resultCount = results.length === MAX_RESULTS ? `${MAX_RESULTS}+` : results.length;
+  const resultHTML = results.map(word => {
+    const wordUrl = getUrl(getWordUrl(word));
+    return `<a href="${wordUrl}" class="word-search__result-item">${word}</a>`;
+  }).join('');
+
+  resultsContainer.innerHTML = `
+    <div class="word-search__results-header">
+      ${resultCount} word${results.length !== 1 ? 's' : ''} found
+    </div>
+    <div class="word-search__results-list">
+      ${resultHTML}
+    </div>
+  `;
+  resultsContainer.style.display = 'block';
+}
+
+let searchTimeout: ReturnType<typeof setTimeout>;
+
+async function handleSearch(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const query = input.value;
+
+  // Clear previous timeout
+  clearTimeout(searchTimeout);
+
+  // Debounce search
+  searchTimeout = setTimeout(async () => {
+    const words = await loadWords();
+    const results = fuzzySearch(query, words);
+    renderResults(results, query);
+  }, 150);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('word-search-input') as HTMLInputElement;
+
+  if (input) {
+    // Preload words on first interaction
+    let wordsLoaded = false;
+    const preloadWords = () => {
+      if (!wordsLoaded) {
+        wordsLoaded = true;
+        loadWords();
+      }
+    };
+
+    input.addEventListener('focus', preloadWords, { once: true });
+    input.addEventListener('input', handleSearch);
+
+    // Clear results when input loses focus (with delay for click handling)
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        const resultsContainer = document.getElementById('word-search-results');
+        if (resultsContainer) {
+          resultsContainer.style.display = 'none';
+        }
+      }, 200);
+    });
+
+    // Show results again when input gains focus (if there's a query)
+    input.addEventListener('focus', () => {
+      const resultsContainer = document.getElementById('word-search-results');
+      if (resultsContainer && input.value && resultsContainer.innerHTML) {
+        resultsContainer.style.display = 'block';
+      }
+    });
+  }
+});
+</script>
+
+<style>
+  .word-search {
+    width: 100%;
+  }
+
+  .word-search__container {
+    position: relative;
+    width: 100%;
+  }
+
+  .word-search__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+  }
+
+  .word-search__input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background: var(--color-background);
+    border: 1px solid var(--color-text-primary);
+    border-radius: 4px;
+    text-transform: lowercase;
+    transition: border-color 0.2s ease;
+  }
+
+  .word-search__input:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-color: var(--color-primary);
+  }
+
+  .word-search__input::placeholder {
+    color: var(--color-text-light, #666);
+  }
+
+  .word-search__results {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: var(--color-background);
+    border: 1px solid var(--color-text-primary);
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .word-search__results-header {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-light, #666);
+    border-bottom: 1px solid var(--color-text-primary);
+  }
+
+  .word-search__results-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .word-search__result-item {
+    padding: 0.75rem 1rem;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .word-search__result-item:last-child {
+    border-bottom: none;
+  }
+
+  .word-search__result-item:hover {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .word-search__result-item:focus {
+    background: var(--color-primary);
+    color: var(--color-white);
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  .word-search__no-results {
+    padding: 1rem;
+    color: var(--color-text-light, #666);
+    text-align: center;
+  }
+
+  .word-search__noscript {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: var(--color-background);
+    border: 1px solid var(--color-text-primary);
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .word-search__noscript a {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
+</style>
