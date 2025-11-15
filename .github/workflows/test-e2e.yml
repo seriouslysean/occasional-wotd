@@ -32,6 +32,7 @@ jobs:
           SITE_TITLE: Demo Word of the Day
           SITE_DESCRIPTION: A demo word of the day site
           SITE_ID: demo-wotd
+          WORDNIK_WEBSITE_URL: https://www.wordnik.com
 
       - name: Start preview server
         run: npm run preview &

@@ -276,9 +276,7 @@ describe('Downstream Build Configuration', () => {
   describe('Data Integrity Across Builds', () => {
     it('should have matching word counts between pages and API', () => {
       // Get word count from API
-      cy.request('/words.json').then((apiResponse) => {
-        const apiWordCount = apiResponse.body.length;
-
+      cy.request('/words.json').then(() => {
         // Visit stats page
         cy.visit('/stats/word-facts');
 
@@ -293,9 +291,7 @@ describe('Downstream Build Configuration', () => {
 
     it('should have consistent data in RSS feed', () => {
       // Get words from API
-      cy.request('/words.json').then((apiResponse) => {
-        const words = apiResponse.body;
-
+      cy.request('/words.json').then(() => {
         // Get RSS feed
         cy.request('/rss.xml').then((rssResponse) => {
           const xml = rssResponse.body;

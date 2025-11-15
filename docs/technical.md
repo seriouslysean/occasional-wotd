@@ -337,6 +337,103 @@ npm run typecheck           # TypeScript validation
 npm run lint                # oxlint checking
 ```
 
+### End-to-End Testing (Cypress)
+
+#### Overview
+The project includes comprehensive Cypress E2E tests that validate user flows and prevent regressions across all page types. These tests complement the unit test suite by focusing on integration, navigation, and real-world usage patterns.
+
+#### Test Coverage
+Cypress tests cover critical happy-path flows:
+
+- **Homepage**: Word of the day display, navigation, metadata, responsive design
+- **Word Detail Pages**: Definitions, metadata, random word functionality, accessibility
+- **Browse Pages**: All browse variations (year, month, letter, length, part-of-speech)
+- **Stats Pages**: Statistics hub and all statistics pages
+- **API Endpoints**: words.json, RSS feed, health.txt, robots.txt, sitemap, manifest.json
+- **Error Pages**: 404 handling, malformed URLs, error scenarios
+- **Downstream Builds**: Multi-site configuration testing (different SOURCE_DIR values)
+
+#### Running Cypress Tests
+
+**Local Development:**
+```bash
+# Build site with demo data first
+SOURCE_DIR=demo SITE_URL=http://localhost:4321 SITE_TITLE="Demo WOTD" \
+  SITE_DESCRIPTION="Demo site" SITE_ID=demo \
+  WORDNIK_WEBSITE_URL=https://www.wordnik.com npm run build
+
+# Start preview server
+npm run preview
+
+# Open Cypress UI (in another terminal)
+npm run test:e2e:open
+
+# Run tests headlessly
+npm run test:e2e
+
+# Run all tests (unit + E2E)
+npm run test:all
+```
+
+**CI/CD:**
+```bash
+# Runs automatically in GitHub Actions on PRs
+# See .github/workflows/test-e2e.yml
+```
+
+#### Custom Commands
+The test suite includes reusable custom commands in `cypress/support/commands.js`:
+
+- `cy.checkPageMetadata()` - Validates title and description
+- `cy.checkStructuredData()` - Verifies JSON-LD schema
+- `cy.checkA11yBasics()` - Basic accessibility checks (landmarks, headings, alt text)
+- `cy.checkResponsive()` - Multi-viewport testing (mobile, tablet, desktop)
+
+#### Test Philosophy
+- **Avoid Unit Test Duplication**: E2E tests focus on integration and user flows, not individual function logic
+- **Test Real User Behavior**: Tests simulate actual user interactions and navigation
+- **Environment-Aware**: Tests work with different SOURCE_DIR configurations
+- **Happy Path Focus**: Validate core functionality works correctly, not edge cases
+- **Regression Prevention**: Catch breaking changes to navigation, data loading, and rendering
+
+#### Test File Organization
+```
+cypress/
+├── e2e/                          # Test specifications
+│   ├── homepage.cy.js            # Homepage tests
+│   ├── word-detail.cy.js         # Word detail page tests
+│   ├── browse.cy.js              # Browse pages tests
+│   ├── stats.cy.js               # Stats pages tests
+│   ├── api-endpoints.cy.js       # API endpoint tests
+│   ├── error-pages.cy.js         # 404 and error tests
+│   └── downstream-builds.cy.js   # Multi-site build tests
+├── fixtures/                     # Test data files
+├── support/                      # Support files
+│   ├── commands.js               # Custom commands
+│   └── e2e.js                    # Support file loader
+├── screenshots/                  # Screenshots (on failure)
+├── videos/                       # Test videos
+└── README.md                     # Cypress documentation
+```
+
+#### CI Integration
+E2E tests run automatically in GitHub Actions (`.github/workflows/test-e2e.yml`):
+
+1. Builds site with demo data
+2. Starts preview server
+3. Runs all Cypress tests in Chrome
+4. Uploads screenshots and videos on failure
+
+The workflow ensures no PR can bypass E2E testing before merging.
+
+#### Downstream Build Testing
+Special tests verify the multi-site architecture works correctly:
+
+- Tests validate site builds with different SOURCE_DIR values
+- Ensures wordbug.fyi and wordbun.fyi type deployments work
+- Verifies URL generation, API endpoints, and navigation across configurations
+- Confirms data integrity between different data sources
+
 ## Content Collections Deep Dive
 
 ### Configuration (`src/content.config.ts`)
