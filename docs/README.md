@@ -135,10 +135,19 @@ Each word file contains the word, date, and rich definition data from your chose
 ## Testing
 
 ```bash
-npm test              # Run all tests
-npm run typecheck     # TypeScript validation
+npm test              # Run all tests with coverage
+npm run test:watch    # Watch mode for development
 npm run lint          # Code style checking
+npm run typecheck     # TypeScript validation
+npx astro check       # Astro-specific checking
+npm run build         # Verify build succeeds
 ```
+
+**Pre-commit hooks automatically run:**
+- Linting (with auto-fix)
+- Tests for changed files only
+
+See [Technical Guide - Testing Strategy](technical.md#testing-strategy) for details.
 
 ## Technology
 
