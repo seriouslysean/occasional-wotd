@@ -49,7 +49,7 @@ describe('Stats Pages', () => {
       cy.get('main').should('not.be.empty');
 
       // Should show numbers/statistics
-      cy.get('main').should('match', /:contains("\d+")/);
+      cy.get('main').invoke('text').should('match', /\d+/);
     });
 
     it('should display total word count', () => {
@@ -118,7 +118,7 @@ describe('Stats Pages', () => {
 
     it('should show streak statistics', () => {
       // Should show numbers related to streaks
-      cy.get('main').should('match', /:contains("\d+")/);
+      cy.get('main').invoke('text').should('match', /\d+/);
     });
 
     it('should have proper metadata', () => {

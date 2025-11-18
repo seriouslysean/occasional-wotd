@@ -149,7 +149,7 @@ describe('Browse Pages', () => {
     });
 
     it('should display letter in heading', () => {
-      cy.get('h1, h2').should('match', /:contains("A|a")/i);
+      cy.get('h1, h2').invoke('text').should('match', /A/i);
     });
 
     it('should display words starting with that letter', () => {

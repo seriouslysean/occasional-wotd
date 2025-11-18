@@ -23,7 +23,7 @@ describe('Word Detail Page', () => {
 
   it('should display the part of speech', () => {
     // Should indicate part of speech
-    cy.get('main').should('match', /:contains("noun|verb|adjective|adverb|pronoun|preposition|conjunction|interjection")/i);
+    cy.get('main').invoke('text').should('match', /\b(noun|verb|adjective|adverb|pronoun|preposition|conjunction|interjection)\b/i);
   });
 
   it('should have proper metadata with word in title', () => {
@@ -58,7 +58,7 @@ describe('Word Detail Page', () => {
 
   it('should display the word date', () => {
     // Should show when the word was posted (date)
-    cy.get('main').should('match', /:contains("2025|2024|2023|January|February|March|April|May|June|July|August|September|October|November|December")/i);
+    cy.get('main').invoke('text').should('match', /2025|2024|2023|January|February|March|April|May|June|July|August|September|October|November|December/i);
   });
 
   it('should be responsive', () => {

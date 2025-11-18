@@ -12,7 +12,7 @@ describe('Error Pages', () => {
       cy.visit('/non-existent-page', { failOnStatusCode: false });
 
       // Should indicate error or show 404 message
-      cy.get('main').should('match', /:contains("404|not found|doesn't exist|error")/i);
+      cy.get('main').invoke('text').should('match', /404|not found|doesn't exist|error/i);
     });
 
     it('should have navigation back to home', () => {

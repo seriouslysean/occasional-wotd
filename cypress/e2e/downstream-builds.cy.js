@@ -118,7 +118,7 @@ describe('Downstream Build Configuration', () => {
       cy.get('main').should('be.visible');
 
       // Should show numbers/counts
-      cy.get('main').should('match', /:contains("\d+")/);
+      cy.get('main').invoke('text').should('match', /\d+/);
     });
   });
 

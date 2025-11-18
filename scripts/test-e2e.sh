@@ -49,7 +49,7 @@ fi
 echo -e "\n${YELLOW}Step 3: Running Cypress tests${NC}"
 
 # Run Cypress based on argument
-if [ "$1" == "open" ]; then
+if [ "$1" = "open" ]; then
   echo -e "${GREEN}Opening Cypress Test Runner...${NC}"
   npm run test:e2e:open
 else
