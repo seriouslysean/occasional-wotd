@@ -45,7 +45,7 @@ jobs:
           npx wait-on http://localhost:4321 --timeout 60000
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v6.7.6
         with:
           wait-on: 'http://localhost:4321'
           wait-on-timeout: 60
