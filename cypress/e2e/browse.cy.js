@@ -91,7 +91,7 @@ describe('Browse Pages', () => {
   describe('Browse by Month', () => {
     beforeEach(() => {
       // Visit January 2025
-      cy.visit('/browse/2025/1');
+      cy.visit('/browse/2025/january');
     });
 
     it('should load successfully', () => {
