@@ -1,0 +1,84 @@
+/**
+ * February Theme - Love Hearts
+ * Slow-falling ASCII hearts in low-contrast light pinks and reds
+ */
+
+/* Heart container - positioned fixed to overlay content */
+.theme-heart {
+	position: fixed;
+	font-size: 20px;
+	color: #ffb3c1;
+	opacity: 0.4;
+	pointer-events: none;
+	user-select: none;
+	z-index: 1;
+	will-change: transform;
+	font-family: Arial, sans-serif;
+}
+
+/* Slow falling animation - 40-60 seconds to traverse screen */
+@keyframes fall-slow {
+	0% {
+		transform: translateY(-50px) rotate(0deg);
+		opacity: 0;
+	}
+	10% {
+		opacity: 0.4;
+	}
+	90% {
+		opacity: 0.4;
+	}
+	100% {
+		transform: translateY(100vh) rotate(10deg);
+		opacity: 0;
+	}
+}
+
+/* Slightly faster variant for variety */
+@keyframes fall-slower {
+	0% {
+		transform: translateY(-50px) rotate(0deg);
+		opacity: 0;
+	}
+	10% {
+		opacity: 0.3;
+	}
+	90% {
+		opacity: 0.3;
+	}
+	100% {
+		transform: translateY(100vh) rotate(-10deg);
+		opacity: 0;
+	}
+}
+
+/* Color variants - light pinks and reds */
+.theme-heart:nth-child(3n + 1) {
+	color: #ffb3c1; /* Light pink */
+}
+
+.theme-heart:nth-child(3n + 2) {
+	color: #ffc0cb; /* Lighter pink */
+}
+
+.theme-heart:nth-child(3n + 3) {
+	color: #ffccd5; /* Very light pink */
+}
+
+/* Animation variants */
+.theme-heart:nth-child(2n) {
+	animation: fall-slow 50s linear infinite;
+}
+
+.theme-heart:nth-child(2n + 1) {
+	animation: fall-slower 60s linear infinite;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+	.theme-heart {
+		animation: none;
+		opacity: 0.2;
+		transform: translateY(20vh);
+	}
+}
