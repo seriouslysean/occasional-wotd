@@ -29,6 +29,11 @@
 - Stats calculations without pre-computation
 
 **Test Coverage** (Updated 2025-11-15 - Significant Progress!)
+- ✅ **E2E Test Suite Complete**: Cypress 15.6.0 with comprehensive happy-path coverage
+  - 7 test files covering homepage, word pages, browse, stats, API endpoints, errors, downstream builds
+  - Custom commands for metadata, accessibility, and responsive testing
+  - GitHub Actions CI integration with automatic test runs on PRs
+  - See docs/technical.md "End-to-End Testing (Cypress)" section
 - ✅ COMPLETED: tests/src/utils/build-utils.spec.js (100% coverage)
 - ✅ COMPLETED: tests/src/utils/image-utils.spec.js (100% coverage)
 - ✅ COMPLETED: tests/src/utils/schema-utils.spec.js (100% coverage)
