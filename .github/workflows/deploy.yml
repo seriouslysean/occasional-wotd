@@ -74,3 +74,21 @@ jobs:
           npm run tool:ping-search-engines -- \
             --site-url "$SITE_URL" \
             --deployed-hash "${{ steps.get_prev_hash.outputs.PREVIOUS_DEPLOYED_HASH }}"
+      - name: Finalize Sentry release
+        if: env.SENTRY_ENABLED == 'true' && env.SENTRY_AUTH_TOKEN != ''
+        env:
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          # Install Sentry CLI
+          curl -sL https://sentry.io/get-cli/ | bash
+
+          # Get release name from environment (set during build)
+          RELEASE="${SENTRY_RELEASE}"
+
+          # Finalize the release and mark as deployed
+          sentry-cli releases finalize "$RELEASE"
+          sentry-cli releases deploys "$RELEASE" new -e production
+
+          echo "✅ Sentry release $RELEASE finalized and deployed"

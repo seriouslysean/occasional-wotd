@@ -10,18 +10,24 @@ const { class: className, ...attrs } = Astro.props;
 </SiteButton>
 
 <script>
+import { addCustomBreadcrumb, addNavigationBreadcrumb, addUIBreadcrumb } from '~astro-utils/sentry-client';
 import { getUrl, getWordUrl, getWordsUrl } from '~astro-utils/url-utils';
 
 const wordListCache = { data: null as string[] | null };
 
 async function getRandomWord() {
   try {
+    addUIBreadcrumb('random-word-button', 'click');
+
     if (!wordListCache.data) {
       const response = await fetch(getUrl('/words.json'));
       if (!response.ok) {
         throw new Error('Failed to fetch words');
       }
       wordListCache.data = await response.json();
+      addCustomBreadcrumb('data', 'Fetched word list for random selection', {
+        wordCount: wordListCache.data.length,
+      });
     }
 
     if (!wordListCache.data || wordListCache.data.length === 0) {
@@ -30,10 +36,16 @@ async function getRandomWord() {
 
     const randomWord = wordListCache.data[Math.floor(Math.random() * wordListCache.data.length)];
     const wordUrl = getUrl(getWordUrl(randomWord));
+    addNavigationBreadcrumb(window.location.pathname, wordUrl, { word: randomWord, source: 'random' });
     window.location.href = wordUrl;
-  } catch {
+  } catch (error) {
     // Fallback to words page on any error
-    window.location.href = getUrl(getWordsUrl());
+    const fallbackUrl = getUrl(getWordsUrl());
+    addCustomBreadcrumb('error', 'Random word selection failed, using fallback', {
+      error: error instanceof Error ? error.message : String(error),
+      fallbackUrl,
+    }, 'warning');
+    window.location.href = fallbackUrl;
   }
 }
 

@@ -33,14 +33,14 @@ const homepageWord = getCurrentWord(allWords);
       {previousWord && (
         <>
           <span class="word-nav__label">{previousLabel}</span>
-          <WordLink word={previousWord} />
+          <WordLink word={previousWord} data-nav-direction="previous" />
         </>
       )}
     </div>
     {nextWord && (
       <div class="word-nav__next">
         <span class="word-nav__label">{nextLabel}</span>
-        <WordLink word={nextWord} {...(nextWord.word === homepageWord?.word && { href: '/' })} />
+        <WordLink word={nextWord} {...(nextWord.word === homepageWord?.word && { href: '/' })} data-nav-direction="next" />
       </div>
     )}
   </div>

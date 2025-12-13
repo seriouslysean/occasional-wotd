@@ -33,7 +33,38 @@ const finalRel = (attrs.target === '_blank' && !attrs.rel) ? 'noopener noreferre
   href={finalHref}
   rel={finalRel}
   class={linkClass}
+  data-track-navigation={!isExternal ? 'true' : undefined}
   {...attrs}
 >
   <slot />
 </a>
+
+<script>
+import { addNavigationBreadcrumb } from '~astro-utils/sentry-client';
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    const link = target.closest('a[data-track-navigation="true"]') as HTMLAnchorElement;
+
+    if (link && link.href) {
+      const linkText = link.textContent?.trim() || 'Unknown';
+      const navDirection = link.getAttribute('data-nav-direction');
+      const breadcrumbData: Record<string, unknown> = {
+        linkText,
+        linkClass: link.className,
+      };
+
+      if (navDirection) {
+        breadcrumbData.navDirection = navDirection;
+      }
+
+      addNavigationBreadcrumb(
+        window.location.pathname,
+        new URL(link.href).pathname,
+        breadcrumbData
+      );
+    }
+  });
+});
+</script>
