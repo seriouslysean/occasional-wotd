@@ -31,7 +31,12 @@ const { title, description, secondaryText } = getPageMetadata(Astro.url.pathname
 
 <Layout title={title} description={description} structuredDataType={STRUCTURED_DATA_TYPE.WORD_LIST}>
   <Heading text={title} secondaryText={secondaryText} />
-  
+
+  <section class="browse__section">
+    <SectionHeading text={t('browse.search')} />
+    <WordSearch maxResults={10} />
+  </section>
+
   {recentWords.length > 0 && (
     <section class="browse__section">
       <SectionHeading text={t('browse.recent')} href={getWordsUrl()} />
@@ -101,11 +106,6 @@ const { title, description, secondaryText } = getPageMetadata(Astro.url.pathname
         </SiteLink>
       ))}
     </div>
-  </section>
-
-  <section class="browse__section">
-    <SectionHeading text={t('browse.search')} />
-    <WordSearch />
   </section>
 
   <section class="browse__section">
