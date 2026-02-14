@@ -2,6 +2,7 @@ import fs from 'fs';
 import { showHelp } from '#tools/help-utils';
 import { getWordFiles } from '#tools/utils';
 import type { WordData } from '#types';
+import { withSentry } from '#utils/sentry';
 
 const SOURCE_DIR = process.env.SOURCE_DIR || 'demo';
 
@@ -122,4 +123,4 @@ if (args.includes('--help') || args.includes('-h')) {
 
 console.log('PreserveCase Migration Tool');
 console.log('============================\n');
-migrateAllWords();
+withSentry('migrate-preserve-case', () => migrateAllWords());

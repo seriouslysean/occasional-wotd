@@ -6,6 +6,7 @@ import { COMMON_ENV_DOCS,showHelp } from '#tools/help-utils';
 import { createWordEntry, findExistingWord } from '#tools/utils';
 import type { WordData } from '#types';
 import { getTodayYYYYMMDD, isValidDate } from '#utils/date-utils';
+import { logError, withSentry } from '#utils/sentry';
 
 /**
  * Checks if a file exists for the given date and returns the existing word if found
@@ -106,11 +107,13 @@ async function addWord(input: string, options: AddWordOptions = {}): Promise<voi
     await createWordEntry(word, { date: targetDate, overwrite, preserveCase });
 
   } catch (error) {
-    if (error.message.includes('not found in dictionary')) {
-      console.error('Word not found in dictionary', { word, errorMessage: error.message });
+    const err = error as Error;
+    if (err.message.includes('not found in dictionary')) {
+      console.error('Word not found in dictionary', { word, errorMessage: err.message });
     } else {
-      console.error('Failed to add word', { word, errorMessage: error.message });
+      console.error('Failed to add word', { word, errorMessage: err.message });
     }
+    logError(err, { tool: 'add-word', word });
     process.exit(1);
   }
 }
@@ -178,8 +181,10 @@ if (!word) {
 }
 
 console.log('Add word tool starting...');
-addWord(word, {
-  date,
-  overwrite: values.overwrite,
-  preserveCase: values['preserve-case'],
-});
+withSentry('add-word', () =>
+  addWord(word, {
+    date,
+    overwrite: values.overwrite,
+    preserveCase: values['preserve-case'],
+  }),
+);

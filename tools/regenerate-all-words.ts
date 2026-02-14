@@ -4,6 +4,7 @@ import { getAdapter } from '#adapters';
 import { COMMON_ENV_DOCS,showHelp } from '#tools/help-utils';
 import { getAllWords } from '#tools/utils';
 import type { WordData } from '#types';
+import { logError, withSentry } from '#utils/sentry';
 import { isValidDictionaryData } from '#utils/word-validation';
 
 interface RegenerateOptions {
@@ -69,13 +70,13 @@ async function regenerateWordFile(word: string, date: string, originalPath: stri
       return regenerateWordFile(word, date, originalPath, retryCount + 1);
     }
 
-    // Log the error with retry info
     console.error('Failed to regenerate word file', {
       word,
       date,
       originalPath: originalPath,
       error: errorMessage,
     });
+    logError(error as Error, { tool: 'regenerate-all-words', word, date });
 
     return false;
   }
@@ -167,6 +168,7 @@ async function regenerateAllWords(options: RegenerateOptions): Promise<void> {
 
   } catch (error) {
     console.error('Failed to regenerate words', { error: (error as Error).message });
+    logError(error as Error, { tool: 'regenerate-all-words' });
     process.exit(1);
   }
 }
@@ -259,4 +261,4 @@ const options: RegenerateOptions = {
 };
 
 // Run the regeneration and write build data
-regenerateAllWords(options);
+withSentry('regenerate-all-words', () => regenerateAllWords(options));

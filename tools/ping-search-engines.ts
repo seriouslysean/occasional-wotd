@@ -17,10 +17,10 @@
 
 import http from 'http';
 import https from 'https';
+import { parseArgs } from 'node:util';
 import { URL } from 'url';
 
-
-import { parseArgs } from 'node:util';
+import { logError, withSentry } from '#utils/sentry';
 
 // Parse command line arguments
 const { values: cliValues } = parseArgs({
@@ -180,6 +180,7 @@ async function pingAll(): Promise<void> {
   results.forEach(result => {
     if (result.error) {
       console.error('Failed to ping search engine', { engine: result.engine, error: result.error });
+      logError(new Error(result.error), { tool: 'ping-search-engines', engine: result.engine }, 'warning');
       return;
     }
     console.log('Successfully pinged search engine', { engine: result.engine, status: result.status });
@@ -187,7 +188,7 @@ async function pingAll(): Promise<void> {
   console.log('Finished pinging search engines');
 }
 
-pingAll().catch(error => {
+withSentry('ping-search-engines', () => pingAll()).catch(error => {
   console.error('Failed to complete ping service', { error: error.message });
   process.exit(0); // Exit with success to not fail workflows
 });

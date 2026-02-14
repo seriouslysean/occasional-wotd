@@ -1,6 +1,7 @@
 import { showHelp } from '#tools/help-utils';
 import { findExistingWord, generateGenericShareImage, generateShareImage, getAllWords } from '#tools/utils';
 import { getAllPageMetadata } from '#utils/page-metadata-utils';
+import { logError, withSentry } from '#utils/sentry';
 
 const HELP_TEXT = `
 Generate Images Tool
@@ -52,7 +53,9 @@ async function generateSingleImage(word: string): Promise<boolean> {
     console.log('Generated image for word', { word: wordData.word, date: wordData.date });
     return true;
   } catch (error) {
-    console.error('Failed to generate image for word', { word, error: (error as Error).message });
+    const err = error as Error;
+    console.error('Failed to generate image for word', { word, error: err.message });
+    logError(err, { tool: 'generate-images', word });
     return false;
   }
 }
@@ -73,11 +76,13 @@ async function generateAllImages(): Promise<void> {
       console.log('Generated image', { word: wordData.word, date: wordData.date });
       successCount++;
     } catch (error) {
+      const err = error as Error;
       console.error('Failed to generate image', {
         word: wordData.word,
         date: wordData.date,
-        error: (error as Error).message,
+        error: err.message,
       });
+      logError(err, { tool: 'generate-images', word: wordData.word, date: wordData.date });
       errorCount++;
     }
   }
@@ -110,11 +115,13 @@ async function generateGenericImages(): Promise<void> {
       console.log('Generated generic image', { title: page.title, path: page.path });
       successCount++;
     } catch (error) {
+      const err = error as Error;
       console.error('Failed to generate generic image', {
         title: page.title,
         path: page.path,
-        error: (error as Error).message,
+        error: err.message,
       });
+      logError(err, { tool: 'generate-images', title: page.title, path: page.path });
       errorCount++;
     }
   }
@@ -144,7 +151,9 @@ async function generatePageImage(pagePath: string): Promise<boolean> {
     console.log('Generated page image', { title: page.title, path: page.path });
     return true;
   } catch (error) {
-    console.error('Failed to generate page image', { pagePath, error: (error as Error).message });
+    const err = error as Error;
+    console.error('Failed to generate page image', { pagePath, error: err.message });
+    logError(err, { tool: 'generate-images', pagePath });
     return false;
   }
 }
@@ -176,35 +185,29 @@ const pagePath = cliValues.page ?? '';
 const word = cliValues.word ?? '';
 
 // Main execution
-(async () => {
-  try {
-    console.log('Generate images tool starting...');
-    if (pagePath) {
-      // Generate specific page image
-      const success = await generatePageImage(pagePath);
-      process.exit(success ? 0 : 1);
-    }
-
-    if (word) {
-      // Generate single word image
-      const success = await generateSingleImage(word);
-      process.exit(success ? 0 : 1);
-    }
-
-    const runWords = hasWords || (!hasWords && !hasGeneric);
-    const runGeneric = hasGeneric || (!hasWords && !hasGeneric);
-
-    if (runWords) {
-      await generateAllImages();
-    }
-
-    if (runGeneric) {
-      await generateGenericImages();
-    }
-
-    process.exit(0);
-  } catch (error) {
-    console.error('Tool execution failed', { error: (error as Error).message });
-    process.exit(1);
+withSentry('generate-images', async () => {
+  console.log('Generate images tool starting...');
+  if (pagePath) {
+    const success = await generatePageImage(pagePath);
+    process.exit(success ? 0 : 1);
   }
-})();
+
+  if (word) {
+    const success = await generateSingleImage(word);
+    process.exit(success ? 0 : 1);
+  }
+
+  const runWords = hasWords || (!hasWords && !hasGeneric);
+  const runGeneric = hasGeneric || (!hasWords && !hasGeneric);
+
+  if (runWords) {
+    await generateAllImages();
+  }
+
+  if (runGeneric) {
+    await generateGenericImages();
+  }
+}).catch((error) => {
+  console.error('Tool execution failed', { error: (error as Error).message });
+  process.exit(1);
+});
