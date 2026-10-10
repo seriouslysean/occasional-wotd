@@ -37,7 +37,9 @@ export const createPaths = (): PathConfig => ({
   words: getWordsPath(),
   pages: path.join(ROOT, 'src', 'pages'),
   images: getImagesPath(),
-  fonts: path.join(ROOT, 'tools', 'fonts'),
+  // PROTOTYPE: the fonts ship with the engine, so they resolve from this
+  // file and not from the site the tool runs in.
+  fonts: path.join(import.meta.dirname, '..', 'tools', 'fonts'),
 });
 
 export const paths = createPaths();

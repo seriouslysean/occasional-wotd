@@ -161,9 +161,11 @@ Requirements:
 ${COMMON_ENV_DOCS}
 `;
 
-if (isEntryPoint(import.meta.url)) {
+// PROTOTYPE: the bin calls this; the entry guard below is false when the
+// tool is started through node_modules/.bin.
+export async function run(args: string[] = process.argv.slice(2)): Promise<void> {
   const { values, positionals } = await parseToolArgs({
-    args: process.argv.slice(2),
+    args,
     options: {
       help: { type: 'boolean', short: 'h', default: false },
       overwrite: { type: 'boolean', short: 'o', default: false },
@@ -195,4 +197,8 @@ if (isEntryPoint(import.meta.url)) {
       await exit(1);
     });
   }
+}
+
+if (isEntryPoint(import.meta.url)) {
+  await run();
 }

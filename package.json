@@ -25,6 +25,31 @@
   "engines": {
     "node": ">=26.0.0"
   },
+  "files": [
+    "adapters",
+    "bin",
+    "config",
+    "constants",
+    "integration",
+    "locales",
+    "src",
+    "tools/*.ts",
+    "tools/fonts",
+    "types",
+    "utils"
+  ],
+  "exports": {
+    ".": {
+      "types": "./integration/index.d.ts",
+      "default": "./integration/index.js"
+    },
+    "./content": "./src/content.config.ts",
+    "./src/pages/*": "./src/pages/*",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "occasional-wotd": "./bin/occasional-wotd.js"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -50,28 +75,31 @@
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
-    "astro": "^7.3.8",
-    "entities": "^8.1.0"
+    "@astrojs/sitemap": "^3.7.4",
+    "@sentry/astro": "^11.6.0",
+    "@sentry/node": "^11.6.0",
+    "cmu-pronouncing-dictionary": "3.0.0",
+    "entities": "^8.1.0",
+    "lightningcss": "^1.33.0",
+    "opentype.js": "^2.0.0",
+    "sharp": "^0.35.5",
+    "subtlex-word-frequencies": "2.0.0",
+    "wordpos": "^2.1.0"
+  },
+  "peerDependencies": {
+    "astro": "^7.3.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/sitemap": "^3.7.4",
     "@playwright/test": "^1.64.0",
-    "@sentry/astro": "^11.6.0",
-    "@sentry/node": "^11.6.0",
     "@types/node": "^26.6.4",
     "@vitest/coverage-v8": "^5.0.3",
-    "cmu-pronouncing-dictionary": "3.0.0",
+    "astro": "^7.3.8",
     "js-yaml": "^5.4.3",
     "lefthook": "^2.2.1",
-    "lightningcss": "^1.33.0",
-    "opentype.js": "^2.0.0",
     "oxlint": "^1.87.0",
-    "sharp": "^0.35.5",
-    "subtlex-word-frequencies": "2.0.0",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.3",
-    "wordpos": "^2.1.0"
+    "vitest": "^5.0.3"
   },
   "imports": {
     "#components/*": "./src/components/*",
