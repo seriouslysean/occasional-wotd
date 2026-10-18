@@ -33,6 +33,7 @@ jobs:
       github.event.workflow_run.event == 'pull_request' &&
       startsWith(github.event.workflow_run.head_branch, 'dependabot/')
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - name: Gate on the PR's checks and Dependabot metadata
         id: gate
