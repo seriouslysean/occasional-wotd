@@ -1,6 +1,6 @@
 # Technical Documentation
 
-Architecture reference for the occasional-wotd project. For philosophy, principles, and code standards, see [AGENTS.md](../AGENTS.md) (also available via the `CLAUDE.md` symlink).
+Architecture reference for the occasional-wotd project. For philosophy, principles, and code standards, see [AGENTS.md](../AGENTS.md) (`CLAUDE.md` imports it).
 
 ## Framework & Stack
 

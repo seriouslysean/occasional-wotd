@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for AI agents working in this repository. This is the canonical source — `CLAUDE.md` symlinks here, and `.github/copilot-instructions.md` contains a distilled version for GitHub Copilot.
+Guidance for AI agents working in this repository. This is the canonical source — `CLAUDE.md` imports it, and `.github/copilot-instructions.md` points to it for GitHub Copilot.
 
 ## Project Overview
 
@@ -280,8 +280,8 @@ Run all quality gates before committing. Stage specific files by name — avoid 
 | Document | Purpose |
 |----------|---------|
 | `AGENTS.md` | Philosophy, principles, working guidance (this file) |
-| `CLAUDE.md` | Symlink to `AGENTS.md` (Claude Code reads this) |
-| `.github/copilot-instructions.md` | Distilled guidelines for GitHub Copilot |
+| `CLAUDE.md` | Imports `AGENTS.md` (Claude Code reads this) |
+| `.github/copilot-instructions.md` | Pointer to `AGENTS.md` for GitHub Copilot |
 | `.github/instructions/` | Scoped Copilot instructions (code review focus/exclusions) |
 | `.github/pull_request_template.md` | PR body template (used by GitHub UI and PR skill) |
 | `.agents/skills/` | Agent skills (validate, commit, pr) — tool-agnostic canonical location |
