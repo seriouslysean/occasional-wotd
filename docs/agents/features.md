@@ -28,7 +28,7 @@ enrichment, search, and build-time visualizations. All code is site-agnostic
   offline, POS-filtered + sense-capped, best-effort) plus Merriam-Webster
   pronunciation, audio URL, and etymology from existing responses. Shared
   `buildWordData` keeps add-word and the backfill in sync; backfill preserves
-  `preserveCase`. WordNet credited in `CREDITS.md` (no UI attribution required).
+  `preserveCase`. WordNet credited in `docs/credits.md` (no UI attribution required).
 - **Static search.** Zero-dependency search behind a header magnifying-glass
   icon — a starts-with filter over the existing `/words.json`. CSP-clean
   processed script, XSS-safe rendering, hidden until JS reveals it; the All Words

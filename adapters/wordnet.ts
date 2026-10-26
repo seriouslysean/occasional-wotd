@@ -9,7 +9,7 @@ import WordPOS from 'wordpos';
  * goes straight to the source. WordNet is the only one of the candidate datasets
  * that carries real antonyms.
  *
- * Attribution lives in CREDITS.md (WordNet license requires preserving the
+ * Attribution lives in docs/credits.md (WordNet license requires preserving the
  * Princeton notice on all copies; no runtime/UI attribution is required).
  */
 export interface WordRelations {

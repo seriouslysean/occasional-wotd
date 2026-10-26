@@ -11,7 +11,7 @@ Static site generator (Astro) for word-of-the-day websites. Powers multiple chil
 Node.js 26+ required (`.nvmrc` provided). No `.env` needed — upstream sets `SOURCE_DIR=demo` via CI variables; downstream repos leave it unset to use root data paths. A local build of the upstream repository has no root data path to fall back on, so it names the demo dataset itself: `SOURCE_DIR=demo npm run build`.
 
 ```sh
-nvm use && npm install             # Setup
+nvm use && npm ci                  # Setup
 npm run dev                        # Dev server
 npm run build                      # Production build
 npm run typecheck                  # TypeScript + Astro check

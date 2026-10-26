@@ -36,7 +36,7 @@ Requires Node.js 26+ (`.nvmrc` provided).
 
 ```bash
 # Install dependencies
-nvm use && npm install
+nvm use && npm ci
 
 # Start development with the bundled demo words
 SOURCE_DIR=demo npm run dev
@@ -217,4 +217,4 @@ See [Technical Guide - Testing](technical.md#testing) for details.
 
 ## License
 
-MIT License - see [LICENSE.md](../LICENSE.md) for details.
+MIT License - see [LICENSE](../LICENSE) for details.
