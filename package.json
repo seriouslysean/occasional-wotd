@@ -44,8 +44,7 @@
     "test:e2e:headed": "playwright test --headed",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
-    "typecheck": "astro check && tsc -p tsconfig.tests.json --noEmit",
-    "prepare": "lefthook install"
+    "typecheck": "astro check && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
