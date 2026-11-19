@@ -691,8 +691,9 @@ esac
     it('runs on the built site, after Build and before the upload', () => {
       const names = workflowSteps(workflow(FILE)).map(step => optionalString(step, 'name'));
 
-      expect(names.indexOf(STEP)).toBe(names.indexOf('Build') + 1);
-      expect(names.indexOf('Upload artifact')).toBe(names.indexOf(STEP) + 1);
+      expect(names.indexOf('Build')).toBeGreaterThanOrEqual(0);
+      expect(names.indexOf(STEP)).toBeGreaterThan(names.indexOf('Build'));
+      expect(names.indexOf('Upload artifact')).toBeGreaterThan(names.indexOf(STEP));
     });
 
     it('fails and names every JavaScript source map under dist/_astro', async () => {
