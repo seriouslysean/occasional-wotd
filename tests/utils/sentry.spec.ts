@@ -2,7 +2,6 @@ import {
   afterEach, beforeEach, describe, expect, it, vi,
 } from 'vitest';
 
-import { sentryDataCollection } from '#utils/sentry-options';
 
 interface SentEvent {
   level: string | undefined;
@@ -77,6 +76,8 @@ describe('utils/logger (CLI logger with Sentry)', () => {
   describe('when SENTRY_ENABLED is false', () => {
     it('logger.error does not call Sentry APIs', async () => {
       vi.stubEnv('SENTRY_ENABLED', 'false');
+      // With a DSN present, so the switch itself is what keeps Sentry off
+      vi.stubEnv('SENTRY_DSN', 'https://test@sentry.io/123');
       const { logger } = await import('#utils/logger');
       const Sentry = await import('@sentry/node');
 
@@ -140,18 +141,22 @@ describe('utils/logger (CLI logger with Sentry)', () => {
       vi.stubEnv('SENTRY_RELEASE', 'site@1.2.3+abc');
       const { logger } = await import('#utils/logger');
       const Sentry = await import('@sentry/node');
+      const { sentryBaselineOptions, withoutDedupe } = await import('#utils/sentry-options');
 
       logger.error('trigger init');
 
       expect(Sentry.init).toHaveBeenCalledOnce();
-      expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({
+      // The whole object, not a subset: an added option (sendDefaultPii) or a dropped one (the
+      // dedupe filter, the privacy baseline) must fail here
+      expect(Sentry.init).toHaveBeenCalledWith({
+        ...sentryBaselineOptions,
+        integrations: withoutDedupe,
         dsn: 'https://test@sentry.io/123',
         environment: 'test',
         release: 'site@1.2.3+abc',
         tracesSampleRate: 0,
-        dataCollection: sentryDataCollection,
         initialScope: { tags: { site: 'test-site', runtime: 'cli' } },
-      }));
+      });
     });
 
     it('logger.warn does not forward to Sentry', async () => {

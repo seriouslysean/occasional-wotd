@@ -102,6 +102,11 @@ describe('utils', () => {
       expect(getUrl('/stats/')).toBe('/blog/stats/');
     });
 
+    it('keeps the site root a directory under a base path with a dot in it', () => {
+      mockEnv.BASE_PATH = '/my.site';
+      expect(getUrl('/')).toBe('/my.site/');
+    });
+
     it.each(['/', '/blog', '/blog/', '/word', '/stats', '/my.site'])(
       'writes a URL under %s that getPathname() and stripBasePath() read back to the route',
       basePath => {
@@ -170,6 +175,11 @@ describe('utils', () => {
     it('keeps a query string and fragment after the page slash', () => {
       mockEnv.BASE_PATH = '/vocab';
       expect(getFullUrl('/stats?page=2#top')).toBe('https://example.com/vocab/stats/?page=2#top');
+    });
+
+    it('adds the base path to a route that begins with the base path itself', () => {
+      mockEnv.BASE_PATH = '/stats';
+      expect(getFullUrl('/stats')).toBe('https://example.com/stats/stats/');
     });
 
     it('does not double a base path that SITE_URL repeats', () => {

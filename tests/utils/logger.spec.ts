@@ -89,7 +89,7 @@ describe('logger', () => {
 
     it('still logs and does not throw when Sentry fails', async () => {
       const { enabledLogger, Sentry } = await loadEnabledLogger();
-      vi.mocked(Sentry.withScope).mockImplementation(() => {
+      vi.mocked(Sentry.withScope).mockImplementationOnce(() => {
         throw new Error('Sentry is down');
       });
 

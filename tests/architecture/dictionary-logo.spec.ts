@@ -35,6 +35,8 @@ describe('Architecture: dictionary logo', () => {
     const attribute = (name: string) => tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
 
     expect(tag).not.toBe('');
+    // The logo file itself is the image shown, not a variant that only refers to it
+    expect(tag).toMatch(/\ssrc=\{merriamWebsterLogo\.src\}/);
     // 50, 100 and 125px are the sizes the guidelines approve, and the logo is square
     expect(['50', '100', '125']).toContain(attribute('width'));
     expect(attribute('height')).toBe(attribute('width'));
